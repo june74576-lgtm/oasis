@@ -1,0 +1,365 @@
+:root{
+    --bg:#131316;
+    --surface:#1c1b1f;
+    --surface-1:#211f26;
+    --surface-2:#26232c;
+    --surface-3:#2b2831;
+    --outline:rgba(255,255,255,.12);
+    --on-surface:#e6e1e9;
+    --on-surface-var:#9992a3;
+
+    --primary:#c6b8ff;
+    --on-primary:#2e1a69;
+    --primary-container:#4b3b90;
+    --on-primary-container:#e4ddff;
+
+    --tertiary:#f0b7d0;
+    --on-tertiary:#4a1230;
+    --tertiary-container:#66375b;
+
+    --radius-xl:32px;
+    --radius-lg:20px;
+    --radius-full:999px;
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+
+body{
+    background:var(--bg);
+    color:var(--on-surface);
+    font-family:"Roboto Flex",system-ui,sans-serif;
+    font-variation-settings:"opsz" 20, "wght" 400;
+}
+
+a{ color:inherit; }
+button{ font-family:inherit; }
+
+/* ===== Header ===== */
+
+header{
+    position:fixed; top:0; width:100%; z-index:100;
+    background:rgba(19,19,22,.55);
+    backdrop-filter:blur(20px);
+    border-bottom:1px solid var(--outline);
+}
+
+.topbar{ width:90%; max-width:1100px; margin:auto; padding:16px 0; }
+
+.brand{
+    color:var(--primary); letter-spacing:4px; font-weight:700;
+    font-variation-settings:"wght" 700; font-size:15px;
+}
+
+/* ===== Hero ===== */
+
+.hero{
+    min-height:100vh; position:relative; overflow:hidden;
+    display:flex; justify-content:center; align-items:center;
+    padding:140px 20px 80px;
+}
+
+.glow{ position:absolute; border-radius:50%; filter:blur(120px); opacity:.5; pointer-events:none; z-index:1; animation:float 14s ease-in-out infinite; }
+.glow-1{ width:480px; height:480px; background:var(--primary); top:-120px; left:8%; }
+.glow-2{ width:420px; height:420px; background:var(--tertiary); bottom:-100px; right:8%; animation-delay:-7s; }
+
+@keyframes float{
+    0%,100%{ transform:translate(0,0) scale(1); }
+    50%{ transform:translate(24px,-18px) scale(1.06); }
+}
+
+.app-card{
+    position:relative; z-index:2; width:min(400px, 88vw);
+    background:linear-gradient(160deg, var(--surface-2), var(--surface-1));
+    border:1px solid var(--outline); border-radius:40px;
+    padding:52px 32px 48px; text-align:center;
+    box-shadow:0 30px 90px rgba(0,0,0,.55);
+}
+
+.logomark{ width:56px; margin:0 auto 22px; }
+.app-card h1{ font-size:38px; font-variation-settings:"wght" 700; letter-spacing:1px; }
+.tagline{ margin-top:8px; color:var(--on-surface-var); font-size:14px; }
+
+/* ===== Carrusel genérico (cursos y estudiantes) ===== */
+
+.cards-section{ padding:110px 8% 60px; text-align:center; }
+
+.carousel-container{ position:relative; display:flex; align-items:center; width:100%; }
+
+.cards,
+.cards-estudiantes{
+    display:flex; flex-wrap:nowrap; justify-content:flex-start; gap:24px;
+    padding:15px 6px; overflow-x:auto; scroll-behavior:smooth; width:100%;
+    -webkit-overflow-scrolling:touch; scrollbar-width:none;
+}
+
+.cards::-webkit-scrollbar,
+.cards-estudiantes::-webkit-scrollbar{ display:none; }
+
+.nav-btn{
+    position:absolute; top:50%; transform:translateY(-50%);
+    width:38px; height:38px; border-radius:var(--radius-full);
+    background:var(--surface-3); border:1px solid var(--outline);
+    color:var(--on-surface); display:flex; align-items:center; justify-content:center;
+    cursor:pointer; z-index:10; transition:.25s; flex-shrink:0;
+}
+.nav-btn:hover{ background:var(--primary); color:var(--on-primary); }
+.nav-btn svg{ width:16px; height:16px; }
+.prev-btn{ left:-6px; }
+.next-btn{ right:-6px; }
+
+/* ===== Tarjetas de curso ===== */
+
+.card{
+    width:300px; min-width:300px; flex-shrink:0;
+    background:var(--surface-1); border:1px solid var(--outline);
+    border-radius:var(--radius-xl); overflow:hidden; cursor:pointer; transition:.3s;
+}
+.card:hover{ transform:translateY(-8px); border-color:var(--primary); }
+.card .thumb{ position:relative; height:200px; overflow:hidden; }
+.card .thumb img{ width:100%; height:100%; object-fit:cover; filter:saturate(.85) brightness(.8); }
+.card .thumb::after{
+    content:""; position:absolute; inset:0;
+    background:linear-gradient(160deg, rgba(75,59,144,.4), rgba(102,55,91,.3));
+    mix-blend-mode:multiply; pointer-events:none;
+}
+.card .info{ padding:20px 22px 24px; text-align:left; }
+.eyebrow{ display:block; color:var(--tertiary); font-size:11px; letter-spacing:2px; text-transform:uppercase; font-variation-settings:"wght" 600; margin-bottom:8px; }
+.card h3{ font-size:19px; font-variation-settings:"wght" 600; }
+
+.courses-empty{ color:var(--on-surface-var); font-size:14px; font-style:italic; padding:20px; }
+
+/* ===== Tarjetas de estudiante (carrusel) ===== */
+
+.card-estudiante{
+    position:relative;
+    width:150px; min-width:150px; flex-shrink:0;
+    background:var(--surface-1); border:1px solid var(--outline);
+    border-radius:var(--radius-lg); overflow:hidden; cursor:pointer; transition:.3s;
+}
+.card-estudiante:hover{ transform:translateY(-6px); border-color:var(--primary); }
+.card-estudiante .thumb{ height:150px; overflow:hidden; }
+.card-estudiante .apellido{ padding:10px; text-align:center; font-size:13px; font-variation-settings:"wght" 600; }
+
+.badge-cargo{
+    position:absolute; top:8px; left:8px; z-index:3;
+    background:var(--tertiary); color:var(--on-tertiary);
+    font-size:9px; font-variation-settings:"wght" 600;
+    padding:3px 8px; border-radius:var(--radius-full);
+}
+
+.students-empty{ color:var(--on-surface-var); font-size:14px; font-style:italic; padding:20px; }
+
+/* ===== Foto o fallback "No Photo" (Material You) ===== */
+
+.photo-slot{ width:100%; height:100%; }
+.photo-slot img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+.no-photo{
+    display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(160deg, var(--primary-container), var(--tertiary-container));
+    color:#fff; font-size:11px; letter-spacing:.5px;
+    font-variation-settings:"wght" 600; text-align:center; padding:6px;
+    border-radius:inherit;
+}
+.photo-slot .no-photo{ width:100%; height:100%; }
+
+.mini-photo-wrap{ width:110px; height:110px; margin:0 auto 18px; position:relative; }
+.mini-photo{ width:110px; height:110px; border-radius:28px; object-fit:cover; }
+
+.prof-photo-wrap{ width:40px; height:40px; position:relative; flex-shrink:0; }
+.prof-photo{ width:40px; height:40px; border-radius:50%; object-fit:cover; }
+.prof-photo.no-photo{ font-size:0; }
+
+/* ===== Separador de sección ===== */
+
+.divider-pill{
+    width:64px; height:6px; border-radius:var(--radius-full);
+    background:linear-gradient(90deg, var(--primary), var(--tertiary));
+    margin:18px auto 0;
+}
+
+/* ===== Sobre la academia ===== */
+
+.about{ text-align:center; padding:110px 15%; background:var(--surface); }
+.about h2{ font-size:38px; font-variation-settings:"wght" 700; }
+.about p{ margin-top:28px; color:var(--on-surface-var); line-height:2; font-size:17px; }
+
+/* ===== Footer ===== */
+
+footer{ text-align:center; padding:34px; background:var(--bg); border-top:1px solid var(--outline); color:var(--on-surface-var); font-size:14px; }
+
+/* ===== Modal principal ===== */
+
+.modal-overlay{
+    position:fixed; inset:0; background:rgba(10,9,12,.72); backdrop-filter:blur(10px);
+    display:flex; justify-content:center; align-items:center; padding:20px;
+    opacity:0; pointer-events:none; transition:.3s; z-index:200;
+}
+.modal-overlay.active{ opacity:1; pointer-events:all; }
+
+.modal{
+    position:relative; background:var(--surface-2); border:1px solid var(--outline);
+    border-radius:36px; padding:44px 32px 36px; width:100%; max-width:640px;
+    max-height:85vh; overflow-y:auto; overscroll-behavior:contain;
+    box-shadow:0 40px 100px rgba(0,0,0,.55);
+}
+.modal::before{
+    content:""; position:absolute; top:16px; left:50%; transform:translateX(-50%);
+    width:40px; height:5px; border-radius:var(--radius-full); background:var(--outline);
+}
+
+.modal-close{
+    position:absolute; top:20px; right:20px; width:36px; height:36px;
+    border-radius:var(--radius-full); background:var(--surface-3); border:none;
+    color:var(--on-surface); display:flex; align-items:center; justify-content:center;
+    cursor:pointer; transition:.25s;
+}
+.modal-close svg{ width:18px; height:18px; }
+.modal-close:hover{ background:var(--primary-container); color:var(--on-primary-container); }
+
+.modal h2{ text-align:center; font-size:26px; font-variation-settings:"wght" 700; }
+
+.section-heading-row{ display:flex; align-items:center; justify-content:center; gap:10px; }
+
+/* ===== Tabla de horario (desktop) ===== */
+
+table.horario{ width:100%; margin-top:8px; border-collapse:separate; border-spacing:6px; }
+
+table.horario th{
+    background:var(--primary-container); color:var(--on-primary-container);
+    padding:10px 4px; border-radius:var(--radius-lg); font-size:11px;
+    letter-spacing:1px; text-transform:uppercase; font-variation-settings:"wght" 600;
+}
+
+table.horario td{
+    background:var(--surface-3); color:var(--on-surface); padding:14px 6px;
+    border-radius:var(--radius-lg); text-align:center; font-size:13px;
+}
+table.horario td.hora-cell{ background:var(--surface-1); color:var(--on-surface-var); font-variation-settings:"wght" 600; }
+table.horario td.recreo-cell{ background:var(--tertiary-container); color:#ffffff; font-variation-settings:"wght" 600; }
+table.horario td.materia-cell{ cursor:pointer; transition:.2s; }
+table.horario td.materia-cell:hover{ background:var(--primary-container); color:var(--on-primary-container); }
+table.horario td.libre-cell{ color:var(--on-surface-var); font-style:italic; font-size:12px; }
+
+/* ===== Horario por día (móvil) ===== */
+
+.horario-mobile{ display:none; }
+
+.day-tabs{ display:flex; gap:8px; overflow-x:auto; margin-bottom:14px; scrollbar-width:none; }
+.day-tabs::-webkit-scrollbar{ display:none; }
+
+.day-tab{
+    flex-shrink:0; background:var(--surface-3); color:var(--on-surface-var);
+    border:none; padding:8px 16px; border-radius:var(--radius-full);
+    font-size:12px; cursor:pointer; transition:.2s;
+}
+.day-tab:hover{ background:var(--primary-container); color:var(--on-primary-container); }
+
+.day-track{ display:flex; overflow-x:auto; scroll-snap-type:x mandatory; width:100%; scrollbar-width:none; }
+.day-track::-webkit-scrollbar{ display:none; }
+
+.day-panel{ min-width:100%; flex-shrink:0; scroll-snap-align:start; padding:0 2px; }
+.day-panel h4{ font-size:15px; margin-bottom:12px; font-variation-settings:"wght" 700; color:var(--primary); }
+
+.day-item{
+    display:flex; justify-content:space-between; align-items:center;
+    background:var(--surface-3); padding:13px 15px; border-radius:var(--radius-lg);
+    margin-bottom:8px; font-size:13px;
+}
+.day-item-hora{ color:var(--on-surface-var); font-size:12px; }
+.day-item-recreo{ background:var(--tertiary-container); color:#ffffff; }
+.day-item.clickable{ cursor:pointer; }
+.day-item.clickable:hover{ background:var(--primary-container); color:var(--on-primary-container); }
+.day-item-libre{ color:var(--on-surface-var); font-style:italic; }
+
+/* ===== Archivos (lista estática) ===== */
+
+.file-list{ list-style:none; display:flex; flex-direction:column; gap:10px; }
+
+.file-list li{
+    background:var(--surface-1); padding:12px 16px; border-radius:var(--radius-lg);
+    display:flex; align-items:center; gap:12px;
+}
+
+.file-icon{
+    width:34px; height:34px; flex-shrink:0; border-radius:var(--radius-full);
+    background:var(--surface-3); display:flex; align-items:center; justify-content:center;
+}
+.file-icon svg{ width:16px; height:16px; color:var(--primary); }
+
+.file-list li a{
+    flex:1; color:var(--on-surface); text-decoration:none;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:14px;
+}
+.file-list li a:hover{ color:var(--primary); }
+
+.file-list .empty{ justify-content:center; color:var(--on-surface-var); font-size:14px; font-style:italic; }
+
+/* ===== Mini modales (estudiante / materia) ===== */
+
+.mini-overlay{
+    position:fixed; inset:0; background:rgba(10,9,12,.72); backdrop-filter:blur(8px);
+    display:flex; justify-content:center; align-items:center; padding:20px;
+    opacity:0; pointer-events:none; transition:.3s; z-index:400;
+}
+.mini-overlay.active{ opacity:1; pointer-events:all; }
+
+.mini-modal{
+    position:relative; background:var(--surface-2); border:1px solid var(--outline);
+    border-radius:28px; padding:36px 28px 30px; width:100%; max-width:360px;
+    text-align:center; box-shadow:0 30px 80px rgba(0,0,0,.5);
+    max-height:85vh; overflow-y:auto; overscroll-behavior:contain;
+}
+
+.mini-modal h3{ font-size:20px; font-variation-settings:"wght" 700; }
+
+.mini-details{ margin-top:18px; display:flex; flex-direction:column; gap:10px; }
+.mini-details p{
+    display:flex; justify-content:space-between; background:var(--surface-1);
+    border-radius:var(--radius-lg); padding:10px 14px; font-size:13px;
+}
+.mini-details p span{ color:var(--on-surface-var); }
+
+.materia-profesor{
+    display:flex; align-items:center; gap:12px; justify-content:center;
+    margin-top:14px; background:var(--surface-1); border-radius:var(--radius-lg); padding:10px 14px;
+}
+.materia-profesor span{ font-size:14px; }
+
+.mini-subhead{ margin-top:20px; text-align:left; font-size:12px; letter-spacing:1px; text-transform:uppercase; color:var(--tertiary); }
+
+.temas-list{ list-style:none; margin-top:10px; display:flex; flex-direction:column; gap:8px; text-align:left; }
+.temas-list li{
+    background:var(--surface-1); border-radius:var(--radius-lg); padding:10px 14px;
+    font-size:13px; display:flex; align-items:center; gap:8px;
+}
+.temas-list li::before{ content:""; width:6px; height:6px; border-radius:50%; background:var(--primary); flex-shrink:0; }
+
+/* ===== Accesibilidad y responsive ===== */
+
+@media(prefers-reduced-motion: reduce){
+    .glow{ animation:none; }
+    .card, .card-estudiante, .modal-close{ transition:none; }
+}
+
+:focus-visible{ outline:2px solid var(--primary); outline-offset:3px; }
+
+@media(max-width:900px){
+    .hero{ padding:120px 16px 60px; }
+    .app-card{ padding:40px 24px 38px; }
+    .app-card h1{ font-size:32px; }
+    .cards-section{ padding:80px 5% 40px; }
+    .about{ padding:90px 8%; }
+    .modal{ padding:40px 20px 28px; }
+}
+
+@media(max-width:700px){
+    /* Sin flechas: se navega arrastrando el dedo */
+    .nav-btn{ display:none; }
+    .cards,
+    .cards-estudiantes{ padding:6px; }
+
+    /* Horario por día en vez de tabla */
+    table.horario{ display:none; }
+    .horario-mobile{ display:block; }
+}

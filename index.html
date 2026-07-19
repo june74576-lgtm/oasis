@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oasis</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,300..800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <div class="topbar">
+        <span class="brand">OASIS</span>
+    </div>
+</header>
+
+<section class="hero">
+
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+
+    <div class="app-card">
+
+        <div class="logomark" aria-hidden="true">
+            <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+                <circle cx="28" cy="28" r="19" style="stroke:url(#ringGrad)" stroke-width="6"/>
+                <path d="M6 34 Q16 24 28 34 T50 34" style="stroke:url(#waveGrad)" stroke-width="5" stroke-linecap="round" fill="none"/>
+                <defs>
+                    <linearGradient id="ringGrad" x1="0" y1="0" x2="56" y2="56">
+                        <stop offset="0" style="stop-color:#c6b8ff"/>
+                        <stop offset="1" style="stop-color:#f0b7d0"/>
+                    </linearGradient>
+                    <linearGradient id="waveGrad" x1="6" y1="34" x2="50" y2="34">
+                        <stop offset="0" style="stop-color:#f0b7d0"/>
+                        <stop offset="1" style="stop-color:#c6b8ff"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+        </div>
+
+        <h1>OASIS</h1>
+        <p class="tagline">Segundo Informática · Portal de clase</p>
+
+    </div>
+
+</section>
+
+<!-- Cursos -->
+<section class="cards-section" id="cards">
+
+    <div class="carousel-container">
+        <button class="nav-btn prev-btn" id="coursesPrevBtn" aria-label="Anterior">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+
+        <div class="cards" id="coursesTrack"></div>
+
+        <button class="nav-btn next-btn" id="coursesNextBtn" aria-label="Siguiente">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+    </div>
+
+</section>
+
+<section class="about" id="about">
+
+    <h2>Todo en un solo lugar</h2>
+    <div class="divider-pill"></div>
+
+    <p>
+        Si hay algun error en alguna fecha, nombre o cualquier otro dato, escribeme al whatsapp para corregirlo.
+    </p>
+
+</section>
+
+<footer>
+    <p>© Oasis</p>
+</footer>
+
+<!-- Modal de curso -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <button class="modal-close" id="modalClose" aria-label="Cerrar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+
+        <h2 id="modalCourseName">Nombre del curso</h2>
+        <div class="divider-pill"></div>
+
+
+
+        <div class="horario-wrapper">
+
+            <table class="horario" id="horarioTable">
+                <thead>
+                    <tr>
+                        <th>Hora</th>
+                        <th>Lunes</th>
+                        <th>Martes</th>
+                        <th>Miercoles</th>
+                        <th>Jueves</th>
+                        <th>Viernes</th>
+                    </tr>
+                </thead>
+                <tbody id="horarioBody"></tbody>
+            </table>
+
+            <div class="horario-mobile" id="horarioMobile">
+                <div class="day-tabs" id="dayTabs"></div>
+                <div class="day-track" id="dayTrack"></div>
+            </div>
+
+        </div>
+
+        <div class="section-heading-row" style="margin-top:44px;">
+            <h2>Estudiantes</h2>
+        </div>
+        <div class="divider-pill"></div>
+
+        <div class="carousel-container">
+            <button class="nav-btn prev-btn" id="studentsPrevBtn" aria-label="Anterior">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+
+            <div class="cards-estudiantes" id="studentsTrack"></div>
+
+            <button class="nav-btn next-btn" id="studentsNextBtn" aria-label="Siguiente">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+        </div>
+
+        <div class="section-heading-row" style="margin-top:44px;">
+            <h2>Archivos</h2>
+        </div>
+        <div class="divider-pill"></div>
+
+        <ul class="file-list" id="fileList"></ul>
+
+    </div>
+</div>
+
+<!-- Mini modal: estudiante -->
+<div class="mini-overlay" id="studentModalOverlay">
+    <div class="mini-modal">
+        <button class="modal-close" id="studentModalClose" aria-label="Cerrar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+
+        <div class="mini-photo-wrap">
+            <img id="studentModalPhoto" class="mini-photo" src="" alt="">
+            <div class="no-photo mini-photo" id="studentPhotoFallback" style="display:none;">No Photo</div>
+        </div>
+
+        <h3 id="studentModalName"></h3>
+        <div class="mini-details">
+            <p><span>Cumpleaños</span><strong id="studentModalBirth">—</strong></p>
+            <p><span>Nivel de inglés</span><strong id="studentModalIngles">—</strong></p>
+        </div>
+    </div>
+</div>
+
+<!-- Mini modal: materia -->
+<div class="mini-overlay" id="materiaModalOverlay">
+    <div class="mini-modal">
+        <button class="modal-close" id="materiaModalClose" aria-label="Cerrar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+        <h3 id="materiaModalNombre"></h3>
+
+        <div class="materia-profesor">
+            <div class="prof-photo-wrap">
+                <img id="materiaModalProfFoto" class="prof-photo" src="" alt="">
+                <div class="no-photo prof-photo" id="profPhotoFallback" style="display:none;"></div>
+            </div>
+            <span id="materiaModalProfNombre"></span>
+        </div>
+
+        <p class="mini-subhead">Temas vistos</p>
+        <ul id="materiaModalTemas" class="temas-list"></ul>
+    </div>
+</div>
+
+<script src="data/cursos.js"></script>
+<script src="data/profesores.js"></script>
+<script src="data/materias.js"></script>
+<script src="data/horarios.js"></script>
+<script src="data/archivos.js"></script>
+<script src="data/estudiantes.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
