@@ -6,8 +6,9 @@ const FILE_ICON_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor
 </svg>`;
 
 let currentCourse = null;
+let dayObserver = null;
 
-/* ===== Bloqueo de scroll de fondo ===== */
+/* ===== Bloqueo de scroll de fondo mientras hay overlays abiertos ===== */
 
 let openOverlays = 0;
 function lockScroll() {
@@ -19,7 +20,7 @@ function unlockScroll() {
     if (openOverlays === 0) document.body.style.overflow = "";
 }
 
-/* ===== Foto o fallback ===== */
+/* ===== Foto o fallback "No Photo" ===== */
 
 function buildPhotoSlot(url, altText) {
     const wrap = document.createElement("div");
@@ -52,11 +53,14 @@ function buildPhotoSlot(url, altText) {
 const courseFullscreen = document.getElementById("courseFullscreen");
 const fsClose = document.getElementById("fsClose");
 const fsCourseName = document.getElementById("fsCourseName");
+const fsTopbar = document.getElementById("fsTopbar");
+const fsTopbarTitle = document.getElementById("fsTopbarTitle");
 const horarioBody = document.getElementById("horarioBody");
 const dayTabs = document.getElementById("dayTabs");
 const dayTrack = document.getElementById("dayTrack");
 
 const fileListEl = document.getElementById("fileList");
+const galeriaTrack = document.getElementById("galeriaTrack");
 
 const coursesTrack = document.getElementById("coursesTrack");
 const coursesPrevBtn = document.getElementById("coursesPrevBtn");
@@ -80,7 +84,6 @@ const materiaModalNombre = document.getElementById("materiaModalNombre");
 const materiaModalProfFoto = document.getElementById("materiaModalProfFoto");
 const profPhotoFallback = document.getElementById("profPhotoFallback");
 const materiaModalProfNombre = document.getElementById("materiaModalProfNombre");
-const materiaModalTemas = document.getElementById("materiaModalTemas");
 
 /* =========================================================
    CURSOS
@@ -102,8 +105,6 @@ function renderCourses() {
     courses.forEach(course => {
         const card = document.createElement("div");
         card.classList.add("card");
-        card.setAttribute("role", "button");
-        card.setAttribute("tabindex", "0");
 
         const thumb = document.createElement("div");
         thumb.classList.add("thumb");
@@ -115,23 +116,7 @@ function renderCourses() {
         info.innerHTML = `<span class="eyebrow">Curso</span><h3>${course.nombre}</h3>`;
         card.appendChild(info);
 
-        card.addEventListener("click", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            openCourseFullscreen(course.id);
-        });
-        card.addEventListener("touchend", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            openCourseFullscreen(course.id);
-        });
-        card.addEventListener("keydown", (e) => {
-            if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                openCourseFullscreen(course.id);
-            }
-        });
-
+        card.addEventListener("click", () => openCourseFullscreen(course.id));
         coursesTrack.appendChild(card);
     });
 }
@@ -142,10 +127,14 @@ coursesNextBtn.addEventListener("click", () => coursesTrack.scrollBy({ left: 320
 renderCourses();
 
 /* =========================================================
-   PANTALLA COMPLETA DE CURSO
+   CURSO A PANTALLA COMPLETA
    ========================================================= */
 
 fsClose.addEventListener("click", closeCourseFullscreen);
+
+courseFullscreen.addEventListener("scroll", () => {
+    fsTopbar.classList.toggle("scrolled", courseFullscreen.scrollTop > 60);
+});
 
 document.addEventListener("keydown", e => {
     if (e.key !== "Escape") return;
@@ -160,16 +149,17 @@ function openCourseFullscreen(courseId) {
 
     currentCourse = courseId;
     fsCourseName.textContent = course.nombre;
+    fsTopbarTitle.textContent = course.nombre;
+    fsTopbar.classList.remove("scrolled");
 
     renderHorario(courseId);
     renderStudentsTrack(courseId);
+    renderGaleria(courseId);
     renderArchivos(courseId);
 
     courseFullscreen.classList.add("active");
+    courseFullscreen.scrollTop = 0;
     lockScroll();
-
-    const fsContent = courseFullscreen.querySelector(".fs-content");
-    if (fsContent) fsContent.scrollTop = 0;
 }
 
 function closeCourseFullscreen() {
@@ -179,7 +169,7 @@ function closeCourseFullscreen() {
 }
 
 /* =========================================================
-   HORARIO
+   HORARIO — tabla desktop + timeline por día en móvil
    ========================================================= */
 
 function materiaNombre(id) {
@@ -253,11 +243,7 @@ function renderHorarioTable(rows) {
                 if (cell) {
                     td.textContent = materiaNombre(cell.materia);
                     td.classList.add("materia-cell");
-                    // Evento click directo sin delegacion
-                    td.onclick = function(ev) {
-                        ev.stopPropagation();
-                        openMateriaModal(cell.materia, cell.profesor);
-                    };
+                    td.addEventListener("click", () => openMateriaModal(cell.materia, cell.profesor));
                 } else {
                     td.textContent = "Libre";
                     td.classList.add("libre-cell");
@@ -278,6 +264,7 @@ function renderHorarioMobile(rows) {
     days.forEach((day, idx) => {
         const tab = document.createElement("button");
         tab.classList.add("day-tab");
+        if (idx === 0) tab.classList.add("active");
         tab.textContent = day.slice(0, 3);
         tab.addEventListener("click", () => {
             dayTrack.children[idx].scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
@@ -287,47 +274,70 @@ function renderHorarioMobile(rows) {
         const panel = document.createElement("div");
         panel.classList.add("day-panel");
 
-        const h4 = document.createElement("h4");
-        h4.textContent = day;
-        panel.appendChild(h4);
-
         rows.forEach(row => {
             const item = document.createElement("div");
-            item.classList.add("day-item");
+            item.classList.add("timeline-item");
+
+            const timeCol = document.createElement("div");
+            timeCol.classList.add("timeline-time-col");
+            timeCol.textContent = row.hora.split(" - ")[0];
+            item.appendChild(timeCol);
+
+            const connector = document.createElement("div");
+            connector.classList.add("timeline-connector");
+            connector.innerHTML = `<span class="timeline-dot"></span><span class="timeline-line"></span>`;
+            item.appendChild(connector);
+
+            const card = document.createElement("div");
 
             if (row.tipo === "recreo") {
-                item.classList.add("day-item-recreo");
-                item.innerHTML = `<span class="day-item-hora">${row.hora}</span><span>${row.label || "Recreo"}</span>`;
+                card.classList.add("timeline-card", "recreo-card");
+                card.textContent = row.label || "Recreo";
             } else {
                 const cell = row[day];
                 if (cell) {
-                    item.innerHTML = `<span class="day-item-hora">${row.hora}</span><span>${materiaNombre(cell.materia)}</span>`;
-                    item.classList.add("clickable");
-                    // Evento click directo
-                    item.onclick = function(ev) {
-                        ev.stopPropagation();
-                        openMateriaModal(cell.materia, cell.profesor);
-                    };
-                    // Soporte touch para movil
-                    item.addEventListener("touchend", function(ev) {
-                        ev.preventDefault();
-                        ev.stopPropagation();
-                        openMateriaModal(cell.materia, cell.profesor);
-                    });
+                    card.classList.add("timeline-card", "clickable");
+                    const prof = findProfesor(cell.profesor);
+                    card.innerHTML = `
+                        <div class="materia-name">${materiaNombre(cell.materia)}</div>
+                        ${prof ? `<div class="prof-name">${prof.nombre}</div>` : ""}
+                    `;
+                    card.addEventListener("click", () => openMateriaModal(cell.materia, cell.profesor));
                 } else {
-                    item.innerHTML = `<span class="day-item-hora">${row.hora}</span><span class="day-item-libre">Libre</span>`;
+                    card.classList.add("timeline-card", "libre-card");
+                    card.textContent = "Libre";
                 }
             }
 
+            item.appendChild(card);
             panel.appendChild(item);
         });
 
         dayTrack.appendChild(panel);
     });
+
+    setupDayObserver();
+}
+
+function setupDayObserver() {
+    if (dayObserver) dayObserver.disconnect();
+
+    dayObserver = new IntersectionObserver(
+        entries => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                const idx = Array.from(dayTrack.children).indexOf(entry.target);
+                document.querySelectorAll(".day-tab").forEach((t, i) => t.classList.toggle("active", i === idx));
+            });
+        },
+        { root: dayTrack, threshold: 0.6 }
+    );
+
+    Array.from(dayTrack.children).forEach(panel => dayObserver.observe(panel));
 }
 
 /* =========================================================
-   MINI MODAL: MATERIA
+   MODAL: MATERIA (solo nombre + profesor)
    ========================================================= */
 
 function findMateria(id) {
@@ -369,18 +379,6 @@ function openMateriaModal(materiaId, profesorId) {
         materiaModalProfNombre.textContent = "Profesor sin asignar";
     }
 
-    materiaModalTemas.innerHTML = "";
-    const temas = materia && materia.temas ? materia.temas : [];
-    if (temas.length === 0) {
-        materiaModalTemas.innerHTML = `<li>Sin temas registrados todavía</li>`;
-    } else {
-        temas.forEach(t => {
-            const li = document.createElement("li");
-            li.textContent = t;
-            materiaModalTemas.appendChild(li);
-        });
-    }
-
     materiaModalOverlay.classList.add("active");
     lockScroll();
 }
@@ -394,8 +392,48 @@ materiaModalClose.addEventListener("click", closeMateriaModal);
 materiaModalOverlay.addEventListener("click", e => { if (e.target === materiaModalOverlay) closeMateriaModal(); });
 
 /* =========================================================
-   ARCHIVOS
+   GALERÍA — carrusel automático, sin control del usuario
    ========================================================= */
+
+function renderGaleria(courseId) {
+    const dbAll = typeof galeriaDB !== "undefined" ? galeriaDB : {};
+    const list = dbAll[courseId] || [];
+    galeriaTrack.innerHTML = "";
+    galeriaTrack.style.animation = "none";
+
+    if (list.length === 0) {
+        galeriaTrack.innerHTML = `<p class="galeria-empty">Sin fotos en la galería todavía</p>`;
+        return;
+    }
+
+    const sizeClasses = ["size-a", "size-b", "size-c"];
+    const doubled = list.concat(list); // loop continuo sin salto
+
+    doubled.forEach((item, i) => {
+        const div = document.createElement("div");
+        div.classList.add("galeria-item", sizeClasses[i % sizeClasses.length]);
+
+        const img = document.createElement("img");
+        img.src = item.ruta;
+        img.alt = "";
+        img.loading = "lazy";
+        div.appendChild(img);
+
+        galeriaTrack.appendChild(div);
+    });
+
+    const duration = Math.max(list.length * 5, 20);
+    galeriaTrack.style.animation = `galeriaScroll ${duration}s linear infinite`;
+}
+
+/* =========================================================
+   ARCHIVOS — grid de tarjetas
+   ========================================================= */
+
+function getFileExt(nombre) {
+    const parts = nombre.split(".");
+    return parts.length > 1 ? parts.pop().toUpperCase() : "";
+}
 
 function renderArchivos(courseId) {
     const dbAll = typeof archivosDB !== "undefined" ? archivosDB : {};
@@ -403,34 +441,38 @@ function renderArchivos(courseId) {
     fileListEl.innerHTML = "";
 
     if (list.length === 0) {
-        const li = document.createElement("li");
-        li.classList.add("empty");
-        li.textContent = "Aún no hay archivos";
-        fileListEl.appendChild(li);
+        fileListEl.innerHTML = `<p class="archivos-empty">Aún no hay archivos</p>`;
         return;
     }
 
     list.forEach(file => {
-        const li = document.createElement("li");
-
-        const icon = document.createElement("span");
-        icon.classList.add("file-icon");
-        icon.innerHTML = FILE_ICON_SVG;
-
         const link = document.createElement("a");
+        link.classList.add("file-card");
         link.href = file.ruta;
         link.target = "_blank";
         link.rel = "noopener";
-        link.textContent = file.nombre;
 
-        li.appendChild(icon);
-        li.appendChild(link);
-        fileListEl.appendChild(li);
+        const icon = document.createElement("div");
+        icon.classList.add("file-card-icon");
+        icon.innerHTML = FILE_ICON_SVG;
+
+        const name = document.createElement("span");
+        name.classList.add("file-card-name");
+        name.textContent = file.nombre.replace(/\.[^/.]+$/, "");
+
+        const ext = document.createElement("span");
+        ext.classList.add("file-card-ext");
+        ext.textContent = getFileExt(file.nombre);
+
+        link.appendChild(icon);
+        link.appendChild(name);
+        link.appendChild(ext);
+        fileListEl.appendChild(link);
     });
 }
 
 /* =========================================================
-   ESTUDIANTES
+   ESTUDIANTES — carrusel, primer apellido, modal
    ========================================================= */
 
 function primerApellido(nombreCompleto) {
@@ -482,12 +524,6 @@ function renderStudentsTrack(courseId) {
         card.appendChild(apellidoEl);
 
         card.addEventListener("click", () => openStudentModal(s));
-        card.addEventListener("touchend", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            openStudentModal(s);
-        });
-
         studentsTrack.appendChild(card);
     });
 }
