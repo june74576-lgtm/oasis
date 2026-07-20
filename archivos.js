@@ -1,0 +1,32 @@
+// Archivos compartidos por curso. Como ya no hay login de admin,
+// esto reemplaza la subida de archivos desde la web: poné el archivo
+// real en la carpeta archivos/<curso>/ y agregá la entrada acá.
+
+const archivosDB = {
+    "2ITA": [
+        { nombre: "40-41.pdf", ruta: "archivos/2ITA/40-41.pdf" },
+        { nombre: "alto_rendimiento_10-19.pdf", ruta: "archivos/2ITA/alto_rendimiento_10-19.pdf" },
+        { nombre: "carpeta_fisica_unidad1.pdf", ruta: "archivos/2ITA/carpeta_fisica_unidad1.pdf" },
+        { nombre: "class Producto.txt", ruta: "archivos/2ITA/class Producto.txt" },
+        { nombre: "diagrama de clases.png", ruta: "archivos/2ITA/diagrama de clases.png" },
+        { nombre: "Diagrama sin título.drawio", ruta: "archivos/2ITA/Diagrama sin título.drawio" },
+        { nombre: "Diagrama.drawio", ruta: "archivos/2ITA/Diagrama.drawio" },
+        { nombre: "identidades-culturales-en-el-arte-ecuatoriano.docx", ruta: "archivos/2ITA/identidades-culturales-en-el-arte-ecuatoriano.docx" },
+        { nombre: "Modulo Soporte Tecnico 2do.pdf", ruta: "archivos/2ITA/Modulo Soporte Tecnico 2do.pdf" },
+        { nombre: "p11_cuaderno_digital.pdf", ruta: "archivos/2ITA/p11_cuaderno_digital.pdf" },
+        { nombre: "p11.pdf", ruta: "archivos/2ITA/p11.pdf" },
+        { nombre: "p14-15.pdf", ruta: "archivos/2ITA/p14-15.pdf" },
+        { nombre: "p16-17.pdf", ruta: "archivos/2ITA/p16-17.pdf" },
+        { nombre: "p17_cuaderno_digital.pdf", ruta: "archivos/2ITA/p17_cuaderno_digital.pdf" },
+        { nombre: "p21_cuaderno_digital.pdf", ruta: "archivos/2ITA/p21_cuaderno_digital.pdf" },
+        { nombre: "p21.pdf", ruta: "archivos/2ITA/p21.pdf" },
+        { nombre: "pag_38-39.pdf", ruta: "archivos/2ITA/pag_38-39.pdf" },
+        { nombre: "pagina_35.pdf", ruta: "archivos/2ITA/pagina_35.pdf" },
+        { nombre: "QuichimboJuan_Caracteristicas_SOM.pdf", ruta: "archivos/2ITA/QuichimboJuan_Caracteristicas_SOM.pdf" },
+        { nombre: "QuichimboJuan_Investigacion.pdf", ruta: "archivos/2ITA/QuichimboJuan_Investigacion.pdf" },
+        { nombre: "QuichimboJuan_Monousuario.pdf", ruta: "archivos/2ITA/QuichimboJuan_Monousuario.pdf" },
+        { nombre: "QuichimboJuan_Preguntas_Redes.pdf", ruta: "archivos/2ITA/QuichimboJuan_Preguntas_Redes.pdf" },
+        { nombre: "temarios_argumento.pdf", ruta: "archivos/2ITA/temarios_argumento.pdf" },
+        { nombre: "temarios_ciudadania.pdf", ruta: "archivos/2ITA/temarios_ciudadania.pdf" }
+    ],
+};

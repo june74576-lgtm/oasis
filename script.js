@@ -7,7 +7,7 @@ const FILE_ICON_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor
 
 let currentCourse = null;
 
-/* ===== Bloqueo de scroll de fondo mientras hay overlays abiertos ===== */
+/* ===== Bloqueo de scroll de fondo ===== */
 
 let openOverlays = 0;
 function lockScroll() {
@@ -19,7 +19,7 @@ function unlockScroll() {
     if (openOverlays === 0) document.body.style.overflow = "";
 }
 
-/* ===== Foto o fallback "No Photo" ===== */
+/* ===== Foto o fallback ===== */
 
 function buildPhotoSlot(url, altText) {
     const wrap = document.createElement("div");
@@ -115,7 +115,6 @@ function renderCourses() {
         info.innerHTML = `<span class="eyebrow">Curso</span><h3>${course.nombre}</h3>`;
         card.appendChild(info);
 
-        // Click + touch support
         card.addEventListener("click", (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -169,7 +168,6 @@ function openCourseFullscreen(courseId) {
     courseFullscreen.classList.add("active");
     lockScroll();
 
-    // Scroll al inicio
     const fsContent = courseFullscreen.querySelector(".fs-content");
     if (fsContent) fsContent.scrollTop = 0;
 }
@@ -181,7 +179,7 @@ function closeCourseFullscreen() {
 }
 
 /* =========================================================
-   HORARIO — de solo lectura, desde horarios.js
+   HORARIO
    ========================================================= */
 
 function materiaNombre(id) {
@@ -255,7 +253,11 @@ function renderHorarioTable(rows) {
                 if (cell) {
                     td.textContent = materiaNombre(cell.materia);
                     td.classList.add("materia-cell");
-                    td.addEventListener("click", () => openMateriaModal(cell.materia, cell.profesor));
+                    // Evento click directo sin delegacion
+                    td.onclick = function(ev) {
+                        ev.stopPropagation();
+                        openMateriaModal(cell.materia, cell.profesor);
+                    };
                 } else {
                     td.textContent = "Libre";
                     td.classList.add("libre-cell");
@@ -301,7 +303,17 @@ function renderHorarioMobile(rows) {
                 if (cell) {
                     item.innerHTML = `<span class="day-item-hora">${row.hora}</span><span>${materiaNombre(cell.materia)}</span>`;
                     item.classList.add("clickable");
-                    item.addEventListener("click", () => openMateriaModal(cell.materia, cell.profesor));
+                    // Evento click directo
+                    item.onclick = function(ev) {
+                        ev.stopPropagation();
+                        openMateriaModal(cell.materia, cell.profesor);
+                    };
+                    // Soporte touch para movil
+                    item.addEventListener("touchend", function(ev) {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        openMateriaModal(cell.materia, cell.profesor);
+                    });
                 } else {
                     item.innerHTML = `<span class="day-item-hora">${row.hora}</span><span class="day-item-libre">Libre</span>`;
                 }
@@ -382,7 +394,7 @@ materiaModalClose.addEventListener("click", closeMateriaModal);
 materiaModalOverlay.addEventListener("click", e => { if (e.target === materiaModalOverlay) closeMateriaModal(); });
 
 /* =========================================================
-   ARCHIVOS — lista estática desde archivos.js
+   ARCHIVOS
    ========================================================= */
 
 function renderArchivos(courseId) {
@@ -418,12 +430,9 @@ function renderArchivos(courseId) {
 }
 
 /* =========================================================
-   ESTUDIANTES — carrusel, primer apellido, mini modal
+   ESTUDIANTES
    ========================================================= */
 
-// Soporta "Nombre Apellido" y "Nombre Nombre Apellido Apellido":
-// los últimos 1 o 2 tokens se toman como apellidos, el primero de esos
-// es el que se muestra en la tarjeta.
 function primerApellido(nombreCompleto) {
     const parts = nombreCompleto.trim().split(/\s+/);
     if (parts.length <= 1) return parts[0] || "";
@@ -473,6 +482,12 @@ function renderStudentsTrack(courseId) {
         card.appendChild(apellidoEl);
 
         card.addEventListener("click", () => openStudentModal(s));
+        card.addEventListener("touchend", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            openStudentModal(s);
+        });
+
         studentsTrack.appendChild(card);
     });
 }

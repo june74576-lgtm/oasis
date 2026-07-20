@@ -1,0 +1,18 @@
+class Producto:
+    def __init__(self, codigo, nombre, precio, stock):
+        self.__codigo = codigo
+        self.nombre = nombre
+        self.precio = precio
+        self.stock = stock
+
+    def setCodigo(self, codigo):
+        self.__codigo = codigo
+
+    def getCodigo(self):
+        return self.__codigo
+
+    def __getTest(self):
+        return "Test"
+
+    def getData(self):
+        return (f"Código: {self.__codigo}, Nombre: {self.nombre}, Precio: {self.precio}, Stock: {self.stock}")

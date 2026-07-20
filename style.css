@@ -342,8 +342,9 @@ table.horario td.libre-cell{ color:var(--on-surface-var); font-style:italic; fon
 }
 .day-item-hora{ color:var(--on-surface-var); font-size:12px; }
 .day-item-recreo{ background:var(--tertiary-container); color:#ffffff; }
-.day-item.clickable{ cursor:pointer; }
+.day-item.clickable{ cursor:pointer; -webkit-tap-highlight-color:transparent; }
 .day-item.clickable:hover{ background:var(--primary-container); color:var(--on-primary-container); }
+.day-item.clickable:active{ background:var(--primary-container); color:var(--on-primary-container); }
 .day-item-libre{ color:var(--on-surface-var); font-style:italic; }
 
 /* ===== Archivos (lista estática) ===== */
@@ -374,7 +375,7 @@ table.horario td.libre-cell{ color:var(--on-surface-var); font-style:italic; fon
 .mini-overlay{
     position:fixed; inset:0; background:rgba(10,9,12,.72); backdrop-filter:blur(8px);
     display:flex; justify-content:center; align-items:center; padding:20px;
-    opacity:0; pointer-events:none; transition:.3s; z-index:400;
+    opacity:0; pointer-events:none; transition:.3s; z-index:600;
 }
 .mini-overlay.active{ opacity:1; pointer-events:all; }
 
