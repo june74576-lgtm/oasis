@@ -102,6 +102,8 @@ function renderCourses() {
     courses.forEach(course => {
         const card = document.createElement("div");
         card.classList.add("card");
+        card.setAttribute("role", "button");
+        card.setAttribute("tabindex", "0");
 
         const thumb = document.createElement("div");
         thumb.classList.add("thumb");
@@ -113,7 +115,24 @@ function renderCourses() {
         info.innerHTML = `<span class="eyebrow">Curso</span><h3>${course.nombre}</h3>`;
         card.appendChild(info);
 
-        card.addEventListener("click", () => openCourseFullscreen(course.id));
+        // Click + touch support
+        card.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            openCourseFullscreen(course.id);
+        });
+        card.addEventListener("touchend", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            openCourseFullscreen(course.id);
+        });
+        card.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                openCourseFullscreen(course.id);
+            }
+        });
+
         coursesTrack.appendChild(card);
     });
 }
