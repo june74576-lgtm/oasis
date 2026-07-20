@@ -188,38 +188,112 @@ header{
 
 footer{ text-align:center; padding:34px; background:var(--bg); border-top:1px solid var(--outline); color:var(--on-surface-var); font-size:14px; }
 
-/* ===== Modal principal ===== */
+/* =========================================================
+   PANTALLA COMPLETA DE CURSO
+   ========================================================= */
 
-.modal-overlay{
-    position:fixed; inset:0; background:rgba(10,9,12,.72); backdrop-filter:blur(10px);
-    display:flex; justify-content:center; align-items:center; padding:20px;
-    opacity:0; pointer-events:none; transition:.3s; z-index:200;
+.course-fullscreen{
+    position:fixed; inset:0; z-index:500;
+    background:var(--bg);
+    display:flex; flex-direction:column;
+    opacity:0; pointer-events:none;
+    transition:opacity .35s ease;
+    overflow:hidden;
 }
-.modal-overlay.active{ opacity:1; pointer-events:all; }
-
-.modal{
-    position:relative; background:var(--surface-2); border:1px solid var(--outline);
-    border-radius:36px; padding:44px 32px 36px; width:100%; max-width:640px;
-    max-height:85vh; overflow-y:auto; overscroll-behavior:contain;
-    box-shadow:0 40px 100px rgba(0,0,0,.55);
-}
-.modal::before{
-    content:""; position:absolute; top:16px; left:50%; transform:translateX(-50%);
-    width:40px; height:5px; border-radius:var(--radius-full); background:var(--outline);
+.course-fullscreen.active{
+    opacity:1; pointer-events:all;
 }
 
-.modal-close{
-    position:absolute; top:20px; right:20px; width:36px; height:36px;
-    border-radius:var(--radius-full); background:var(--surface-3); border:none;
+/* Botón cerrar */
+.fs-close{
+    position:fixed; top:16px; right:16px; z-index:520;
+    width:44px; height:44px; border-radius:var(--radius-full);
+    background:var(--surface-3); border:1px solid var(--outline);
     color:var(--on-surface); display:flex; align-items:center; justify-content:center;
     cursor:pointer; transition:.25s;
+    backdrop-filter:blur(12px);
 }
-.modal-close svg{ width:18px; height:18px; }
-.modal-close:hover{ background:var(--primary-container); color:var(--on-primary-container); }
+.fs-close:hover{ background:var(--primary); color:var(--on-primary); }
+.fs-close svg{ width:20px; height:20px; }
 
-.modal h2{ text-align:center; font-size:26px; font-variation-settings:"wght" 700; }
+/* Contenido scrolleable */
+.fs-content{
+    flex:1;
+    overflow-y:auto;
+    overflow-x:hidden;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+}
 
-.section-heading-row{ display:flex; align-items:center; justify-content:center; gap:10px; }
+/* Hero de la pantalla completa */
+.fs-hero{
+    position:relative;
+    min-height:260px;
+    display:flex; align-items:flex-end;
+    padding:80px 24px 32px;
+    overflow:hidden;
+}
+
+.fs-hero-glow{
+    position:absolute; inset:0;
+    background:
+        radial-gradient(ellipse 80% 60% at 20% 30%, rgba(198,184,255,.25), transparent 60%),
+        radial-gradient(ellipse 70% 50% at 80% 70%, rgba(240,183,208,.20), transparent 60%);
+    pointer-events:none;
+    animation:float 14s ease-in-out infinite;
+}
+
+.fs-hero-info{
+    position:relative; z-index:2;
+    width:100%; max-width:1100px; margin:0 auto;
+}
+
+.fs-eyebrow{
+    display:block;
+    color:var(--tertiary);
+    font-size:11px;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    font-variation-settings:"wght" 600;
+    margin-bottom:10px;
+}
+
+.fs-hero-info h1{
+    font-size:clamp(28px, 6vw, 52px);
+    font-variation-settings:"wght" 700;
+    letter-spacing:-.5px;
+    line-height:1.1;
+}
+
+/* Cuerpo con secciones */
+.fs-body{
+    width:100%; max-width:1100px;
+    margin:0 auto;
+    padding:0 24px 60px;
+    display:flex; flex-direction:column;
+    gap:56px;
+}
+
+.fs-section{
+    animation:fadeUp .5s ease both;
+}
+.fs-section:nth-child(1){ animation-delay:.05s; }
+.fs-section:nth-child(2){ animation-delay:.12s; }
+.fs-section:nth-child(3){ animation-delay:.19s; }
+
+@keyframes fadeUp{
+    from{ opacity:0; transform:translateY(20px); }
+    to{ opacity:1; transform:translateY(0); }
+}
+
+.fs-section-header{
+    text-align:center;
+    margin-bottom:28px;
+}
+.fs-section-header h2{
+    font-size:clamp(22px, 4vw, 30px);
+    font-variation-settings:"wght" 700;
+}
 
 /* ===== Tabla de horario (desktop) ===== */
 
@@ -340,6 +414,7 @@ table.horario td.libre-cell{ color:var(--on-surface-var); font-style:italic; fon
 @media(prefers-reduced-motion: reduce){
     .glow{ animation:none; }
     .card, .card-estudiante, .modal-close{ transition:none; }
+    .course-fullscreen, .fs-section{ animation:none; }
 }
 
 :focus-visible{ outline:2px solid var(--primary); outline-offset:3px; }
@@ -350,7 +425,8 @@ table.horario td.libre-cell{ color:var(--on-surface-var); font-style:italic; fon
     .app-card h1{ font-size:32px; }
     .cards-section{ padding:80px 5% 40px; }
     .about{ padding:90px 8%; }
-    .modal{ padding:40px 20px 28px; }
+    .fs-hero{ min-height:220px; padding:70px 20px 28px; }
+    .fs-body{ padding:0 16px 48px; gap:44px; }
 }
 
 @media(max-width:700px){
@@ -362,4 +438,9 @@ table.horario td.libre-cell{ color:var(--on-surface-var); font-style:italic; fon
     /* Horario por día en vez de tabla */
     table.horario{ display:none; }
     .horario-mobile{ display:block; }
+
+    .fs-hero{ min-height:200px; padding:60px 16px 24px; }
+    .fs-body{ padding:0 12px 40px; gap:36px; }
+    .fs-section-header{ margin-bottom:20px; }
+    .fs-close{ top:12px; right:12px; width:40px; height:40px; }
 }

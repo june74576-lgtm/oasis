@@ -49,9 +49,9 @@ function buildPhotoSlot(url, altText) {
 
 /* ===== Elementos ===== */
 
-const overlay = document.getElementById("modalOverlay");
-const closeBtn = document.getElementById("modalClose");
-const courseNameEl = document.getElementById("modalCourseName");
+const courseFullscreen = document.getElementById("courseFullscreen");
+const fsClose = document.getElementById("fsClose");
+const fsCourseName = document.getElementById("fsCourseName");
 const horarioBody = document.getElementById("horarioBody");
 const dayTabs = document.getElementById("dayTabs");
 const dayTrack = document.getElementById("dayTrack");
@@ -113,7 +113,7 @@ function renderCourses() {
         info.innerHTML = `<span class="eyebrow">Curso</span><h3>${course.nombre}</h3>`;
         card.appendChild(info);
 
-        card.addEventListener("click", () => openModal(course.id));
+        card.addEventListener("click", () => openCourseFullscreen(course.id));
         coursesTrack.appendChild(card);
     });
 }
@@ -124,36 +124,39 @@ coursesNextBtn.addEventListener("click", () => coursesTrack.scrollBy({ left: 320
 renderCourses();
 
 /* =========================================================
-   MODAL DE CURSO
+   PANTALLA COMPLETA DE CURSO
    ========================================================= */
 
-closeBtn.addEventListener("click", closeModal);
-overlay.addEventListener("click", e => { if (e.target === overlay) closeModal(); });
+fsClose.addEventListener("click", closeCourseFullscreen);
 
 document.addEventListener("keydown", e => {
     if (e.key !== "Escape") return;
     if (materiaModalOverlay.classList.contains("active")) closeMateriaModal();
     else if (studentModalOverlay.classList.contains("active")) closeStudentModal();
-    else if (overlay.classList.contains("active")) closeModal();
+    else if (courseFullscreen.classList.contains("active")) closeCourseFullscreen();
 });
 
-function openModal(courseId) {
+function openCourseFullscreen(courseId) {
     const course = getCourseById(courseId);
     if (!course) return;
 
     currentCourse = courseId;
-    courseNameEl.textContent = course.nombre;
+    fsCourseName.textContent = course.nombre;
 
     renderHorario(courseId);
     renderStudentsTrack(courseId);
     renderArchivos(courseId);
 
-    overlay.classList.add("active");
+    courseFullscreen.classList.add("active");
     lockScroll();
+
+    // Scroll al inicio
+    const fsContent = courseFullscreen.querySelector(".fs-content");
+    if (fsContent) fsContent.scrollTop = 0;
 }
 
-function closeModal() {
-    overlay.classList.remove("active");
+function closeCourseFullscreen() {
+    courseFullscreen.classList.remove("active");
     currentCourse = null;
     unlockScroll();
 }

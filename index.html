@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,300..800&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="style.css">
+<base target="_blank">
 </head>
 <body>
 
@@ -82,65 +83,77 @@
     <p>© Oasis</p>
 </footer>
 
-<!-- Modal de curso -->
-<div class="modal-overlay" id="modalOverlay">
-    <div class="modal">
-        <button class="modal-close" id="modalClose" aria-label="Cerrar">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
-        </button>
+<!-- Pantalla completa de curso -->
+<div class="course-fullscreen" id="courseFullscreen">
+    <button class="fs-close" id="fsClose" aria-label="Cerrar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
 
-        <h2 id="modalCourseName">Nombre del curso</h2>
-        <div class="divider-pill"></div>
-
-
-
-        <div class="horario-wrapper">
-
-            <table class="horario" id="horarioTable">
-                <thead>
-                    <tr>
-                        <th>Hora</th>
-                        <th>Lunes</th>
-                        <th>Martes</th>
-                        <th>Miercoles</th>
-                        <th>Jueves</th>
-                        <th>Viernes</th>
-                    </tr>
-                </thead>
-                <tbody id="horarioBody"></tbody>
-            </table>
-
-            <div class="horario-mobile" id="horarioMobile">
-                <div class="day-tabs" id="dayTabs"></div>
-                <div class="day-track" id="dayTrack"></div>
+    <div class="fs-content">
+        <div class="fs-hero">
+            <div class="fs-hero-glow"></div>
+            <div class="fs-hero-info">
+                <span class="fs-eyebrow">Curso</span>
+                <h1 id="fsCourseName">Nombre del curso</h1>
             </div>
-
         </div>
 
-        <div class="section-heading-row" style="margin-top:44px;">
-            <h2>Estudiantes</h2>
+        <div class="fs-body">
+
+            <!-- Horario -->
+            <section class="fs-section">
+                <div class="fs-section-header">
+                    <h2>Horario</h2>
+                    <div class="divider-pill"></div>
+                </div>
+                <div class="horario-wrapper">
+                    <table class="horario" id="horarioTable">
+                        <thead>
+                            <tr>
+                                <th>Hora</th>
+                                <th>Lunes</th>
+                                <th>Martes</th>
+                                <th>Miercoles</th>
+                                <th>Jueves</th>
+                                <th>Viernes</th>
+                            </tr>
+                        </thead>
+                        <tbody id="horarioBody"></tbody>
+                    </table>
+                    <div class="horario-mobile" id="horarioMobile">
+                        <div class="day-tabs" id="dayTabs"></div>
+                        <div class="day-track" id="dayTrack"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Estudiantes -->
+            <section class="fs-section">
+                <div class="fs-section-header">
+                    <h2>Estudiantes</h2>
+                    <div class="divider-pill"></div>
+                </div>
+                <div class="carousel-container">
+                    <button class="nav-btn prev-btn" id="studentsPrevBtn" aria-label="Anterior">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                    </button>
+                    <div class="cards-estudiantes" id="studentsTrack"></div>
+                    <button class="nav-btn next-btn" id="studentsNextBtn" aria-label="Siguiente">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Archivos -->
+            <section class="fs-section">
+                <div class="fs-section-header">
+                    <h2>Archivos</h2>
+                    <div class="divider-pill"></div>
+                </div>
+                <ul class="file-list" id="fileList"></ul>
+            </section>
+
         </div>
-        <div class="divider-pill"></div>
-
-        <div class="carousel-container">
-            <button class="nav-btn prev-btn" id="studentsPrevBtn" aria-label="Anterior">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-            </button>
-
-            <div class="cards-estudiantes" id="studentsTrack"></div>
-
-            <button class="nav-btn next-btn" id="studentsNextBtn" aria-label="Siguiente">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-            </button>
-        </div>
-
-        <div class="section-heading-row" style="margin-top:44px;">
-            <h2>Archivos</h2>
-        </div>
-        <div class="divider-pill"></div>
-
-        <ul class="file-list" id="fileList"></ul>
-
     </div>
 </div>
 
