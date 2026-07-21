@@ -58,7 +58,7 @@ const estudiantesDB = [
         nombre: "Jeremy Josue Moya León",
         foto: "fotos_estudiantes/moyajeremy.jpg",
         curso: "2ITA",
-        fechaNacimiento: "2007-01-10",
+        fechaNacimiento: "2010-10-07",
         nivelIngles: "Advanced (B2)",
         cargo: ""
     },
