@@ -158,6 +158,7 @@ function formatFecha(fecha) {
 /* ===== FIREBASE ===== */
 
 function firebaseListo() {
+    // db se define en el head del HTML (inline)
     return typeof db !== "undefined" && db !== null;
 }
 
@@ -176,7 +177,7 @@ async function loadMateriaArchivos(materiaId) {
         files.sort((a, b) => (b.fecha || "").localeCompare(a.fecha || ""));
         renderMateriaArchivos(files);
     } catch (err) {
-        console.error(err);
+        console.error("Error cargando archivos:", err);
         materiaArchivosList.innerHTML = `<p class="materia-archivos-empty">Error al cargar archivos.</p>`;
     }
 }

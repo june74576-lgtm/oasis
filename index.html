@@ -10,6 +10,38 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,300..800&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="style.css">
+
+    <!-- Firebase v8 CDN -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <!-- Configuracion de Firebase inline (asegura que firebase este cargado) -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyANuIq0Te9cuLg5w5AFqa2wpXxVLR0sVZI",
+            authDomain: "oasis-548cf.firebaseapp.com",
+            projectId: "oasis-548cf",
+            storageBucket: "oasis-548cf.appspot.com",
+            messagingSenderId: "604369694270",
+            appId: "1:604369694270:web:a46f693c06ab6879172b6f",
+            measurementId: "G-DRWKJNJ85L"
+        };
+
+        let db = null;
+
+        try {
+            if (typeof firebase !== "undefined") {
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.firestore();
+                console.log("Firebase inicializado correctamente");
+                console.log("db:", db);
+            } else {
+                console.error("Firebase no esta definido. Verifica que los scripts de Firebase se cargaron.");
+            }
+        } catch (err) {
+            console.error("Error al inicializar Firebase:", err);
+        }
+    </script>
 <base target="_blank">
 </head>
 <body>
@@ -207,11 +239,7 @@
     </div>
 </div>
 
-<!-- Firebase v8 (API global, estable) -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
-<script src="data/firebase-config.js"></script>
+<!-- Datos locales -->
 <script src="data/cursos.js"></script>
 <script src="data/profesores.js"></script>
 <script src="data/materias.js"></script>
