@@ -6,9 +6,10 @@ const FILE_ICON_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor
 </svg>`;
 
 let currentCourse = null;
+let currentMateriaId = null;
 let dayObserver = null;
 
-/* ===== Bloqueo de scroll de fondo mientras hay overlays abiertos ===== */
+/* ===== Bloqueo de scroll ===== */
 
 let openOverlays = 0;
 function lockScroll() {
@@ -20,12 +21,11 @@ function unlockScroll() {
     if (openOverlays === 0) document.body.style.overflow = "";
 }
 
-/* ===== Foto o fallback "No Photo" ===== */
+/* ===== Foto o fallback ===== */
 
 function buildPhotoSlot(url, altText) {
     const wrap = document.createElement("div");
     wrap.classList.add("photo-slot");
-
     if (url) {
         const img = document.createElement("img");
         img.alt = altText;
@@ -44,7 +44,6 @@ function buildPhotoSlot(url, altText) {
         fallback.textContent = "No Photo";
         wrap.appendChild(fallback);
     }
-
     return wrap;
 }
 
@@ -58,7 +57,6 @@ const fsTopbarTitle = document.getElementById("fsTopbarTitle");
 const horarioBody = document.getElementById("horarioBody");
 const dayTabs = document.getElementById("dayTabs");
 const dayTrack = document.getElementById("dayTrack");
-
 const galeriaTrack = document.getElementById("galeriaTrack");
 
 const coursesTrack = document.getElementById("coursesTrack");
@@ -84,27 +82,195 @@ const materiaModalNombre = document.getElementById("materiaModalNombre");
 const materiaModalProfFoto = document.getElementById("materiaModalProfFoto");
 const profPhotoFallback = document.getElementById("profPhotoFallback");
 const materiaModalProfNombre = document.getElementById("materiaModalProfNombre");
+const materiaArchivosList = document.getElementById("materiaArchivosList");
+const dropzone = document.getElementById("dropzone");
+const materiaFileInput = document.getElementById("materiaFileInput");
+const uploadLoginHint = document.getElementById("uploadLoginHint");
 
-/* =========================================================
-   CURSOS
-   ========================================================= */
+const loginBtn = document.getElementById("loginBtn");
+const userChip = document.getElementById("userChip");
+const userChipName = document.getElementById("userChipName");
+const logoutBtn = document.getElementById("logoutBtn");
+
+const loginModalOverlay = document.getElementById("loginModalOverlay");
+const loginModalClose = document.getElementById("loginModalClose");
+const loginUsername = document.getElementById("loginUsername");
+const loginPassword = document.getElementById("loginPassword");
+const loginError = document.getElementById("loginError");
+const loginSubmitBtn = document.getElementById("loginSubmitBtn");
+
+/* ===== UTILIDADES ===== */
+
+function findMateria(id) {
+    const list = typeof materiasDB !== "undefined" ? materiasDB : [];
+    return list.find(m => m.id === id);
+}
+
+function findProfesor(id) {
+    const list = typeof profesoresDB !== "undefined" ? profesoresDB : [];
+    return list.find(p => p.id === id);
+}
 
 function getCourseById(id) {
     return (typeof cursosDB !== "undefined" ? cursosDB : []).find(c => c.id === id);
 }
 
+function primerNombreCompleto(nombreCompleto) {
+    const parts = nombreCompleto.trim().split(/\s+/);
+    if (parts.length === 0) return "";
+    const apellidosCount = parts.length >= 3 ? 2 : 1;
+    const nombre = parts[0];
+    const apellido = parts[parts.length - apellidosCount] || parts[parts.length - 1] || "";
+    return nombre + " " + apellido;
+}
+
+function normalizar(str) {
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function datosLogin(estudiante) {
+    const partes = estudiante.nombre.trim().split(/\s+/);
+    const apellidosCount = partes.length >= 3 ? 2 : (partes.length === 2 ? 1 : 0);
+    const primerNombre = partes[0] || "";
+    const primerApellido = partes[partes.length - apellidosCount] || partes[partes.length - 1] || "";
+    const anio = estudiante.fechaNacimiento ? estudiante.fechaNacimiento.slice(0, 4) : "";
+    return {
+        username: normalizar(primerNombre + primerApellido),
+        password: normalizar(primerApellido + primerNombre + anio)
+    };
+}
+
+function primerApellido(nombreCompleto) {
+    const parts = nombreCompleto.trim().split(/\s+/);
+    if (parts.length <= 1) return parts[0] || "";
+    const apellidosCount = parts.length >= 3 ? 2 : 1;
+    return parts[parts.length - apellidosCount] || "";
+}
+
+function formatFecha(fecha) {
+    if (!fecha) return "-";
+    try {
+        const d = new Date(fecha + "T00:00:00");
+        return new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "long", year: "numeric" }).format(d);
+    } catch { return fecha; }
+}
+
+/* ===== FIREBASE ===== */
+
+function firebaseListo() {
+    return typeof db !== "undefined" && db !== null;
+}
+
+const MAX_FILE_SIZE = 700 * 1024;
+
+async function loadMateriaArchivos(materiaId) {
+    materiaArchivosList.innerHTML = `<p class="materia-archivos-empty">Cargando...</p>`;
+    if (!firebaseListo()) {
+        materiaArchivosList.innerHTML = `<p class="materia-archivos-empty">Firebase no configurado.</p>`;
+        return;
+    }
+    try {
+        const snap = await db.collection("archivos").where("materia", "==", materiaId).get();
+        const files = [];
+        snap.forEach(doc => files.push(doc.data()));
+        files.sort((a, b) => (b.fecha || "").localeCompare(a.fecha || ""));
+        renderMateriaArchivos(files);
+    } catch (err) {
+        console.error(err);
+        materiaArchivosList.innerHTML = `<p class="materia-archivos-empty">Error al cargar archivos.</p>`;
+    }
+}
+
+function renderMateriaArchivos(files) {
+    materiaArchivosList.innerHTML = "";
+    if (files.length === 0) {
+        materiaArchivosList.innerHTML = `<p class="materia-archivos-empty">Aun no hay archivos</p>`;
+        return;
+    }
+    files.forEach(file => {
+        const row = document.createElement("div");
+        row.classList.add("archivo-row");
+        const subidoPor = file.subidoPorNombre ? `Subido por ${file.subidoPorNombre}` : "";
+        row.innerHTML = `
+            <span class="archivo-icon">${FILE_ICON_SVG}</span>
+            <div class="archivo-info">
+                <a class="archivo-nombre" href="${file.data}" download="${file.nombre}">${file.nombre}</a>
+                ${subidoPor ? `<div class="archivo-meta">${subidoPor}</div>` : ""}
+            </div>
+        `;
+        materiaArchivosList.appendChild(row);
+    });
+}
+
+function leerComoBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+async function subirArchivos(files) {
+    if (!currentUser || !firebaseListo() || !currentMateriaId) return;
+    const demasiadoGrandes = Array.from(files).filter(f => f.size > MAX_FILE_SIZE);
+    if (demasiadoGrandes.length > 0) {
+        alert(`"${demasiadoGrandes[0].name}" pesa demasiado (maximo ~700 KB).`);
+        return;
+    }
+    dropzone.classList.add("dragging");
+    dropzone.querySelector("p").textContent = "Subiendo...";
+    try {
+        for (const file of Array.from(files)) {
+            const data = await leerComoBase64(file);
+            await db.collection("archivos").add({
+                materia: currentMateriaId,
+                curso: currentCourse,
+                nombre: file.name,
+                data,
+                subidoPorId: currentUser.id,
+                subidoPorNombre: currentUser.nombre,
+                fecha: new Date().toISOString()
+            });
+        }
+        await loadMateriaArchivos(currentMateriaId);
+    } catch (err) {
+        console.error(err);
+        alert("Error al subir. Revisa la consola (F12).");
+    } finally {
+        dropzone.classList.remove("dragging");
+        dropzone.querySelector("p").innerHTML = `Arrastra un archivo aca, o <span class="dropzone-link">hace click</span> (max. ~700 KB)`;
+        materiaFileInput.value = "";
+    }
+}
+
+function updateUploadUI() {
+    if (currentUser && firebaseListo()) {
+        dropzone.style.display = "block";
+        uploadLoginHint.style.display = "none";
+    } else {
+        dropzone.style.display = "none";
+        uploadLoginHint.style.display = "block";
+        uploadLoginHint.textContent = firebaseListo()
+            ? "Inicia sesion para subir archivos."
+            : "Firebase todavia no esta configurado.";
+    }
+}
+
+/* ===== CURSOS ===== */
+
 function renderCourses() {
     const courses = typeof cursosDB !== "undefined" ? cursosDB : [];
     coursesTrack.innerHTML = "";
-
     if (courses.length === 0) {
-        coursesTrack.innerHTML = `<p class="courses-empty">No hay cursos todavía</p>`;
+        coursesTrack.innerHTML = `<p class="courses-empty">No hay cursos todavia</p>`;
         return;
     }
-
     courses.forEach(course => {
         const card = document.createElement("div");
         card.classList.add("card");
+        card.setAttribute("role", "button");
+        card.setAttribute("tabindex", "0");
 
         const thumb = document.createElement("div");
         thumb.classList.add("thumb");
@@ -116,7 +282,23 @@ function renderCourses() {
         info.innerHTML = `<span class="eyebrow">Curso</span><h3>${course.nombre}</h3>`;
         card.appendChild(info);
 
-        card.addEventListener("click", () => openCourseFullscreen(course.id));
+        card.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            openCourseFullscreen(course.id);
+        });
+        card.addEventListener("touchend", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            openCourseFullscreen(course.id);
+        });
+        card.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                openCourseFullscreen(course.id);
+            }
+        });
+
         coursesTrack.appendChild(card);
     });
 }
@@ -126,9 +308,7 @@ coursesNextBtn.addEventListener("click", () => coursesTrack.scrollBy({ left: 320
 
 renderCourses();
 
-/* =========================================================
-   CURSO A PANTALLA COMPLETA
-   ========================================================= */
+/* ===== PANTALLA COMPLETA ===== */
 
 fsClose.addEventListener("click", closeCourseFullscreen);
 
@@ -140,22 +320,20 @@ document.addEventListener("keydown", e => {
     if (e.key !== "Escape") return;
     if (materiaModalOverlay.classList.contains("active")) closeMateriaModal();
     else if (studentModalOverlay.classList.contains("active")) closeStudentModal();
+    else if (loginModalOverlay.classList.contains("active")) closeLoginModal();
     else if (courseFullscreen.classList.contains("active")) closeCourseFullscreen();
 });
 
 function openCourseFullscreen(courseId) {
     const course = getCourseById(courseId);
     if (!course) return;
-
     currentCourse = courseId;
     fsCourseName.textContent = course.nombre;
     fsTopbarTitle.textContent = course.nombre;
     fsTopbar.classList.remove("scrolled");
-
     renderHorario(courseId);
     renderStudentsTrack(courseId);
     renderGaleria(courseId);
-
     courseFullscreen.classList.add("active");
     courseFullscreen.scrollTop = 0;
     lockScroll();
@@ -167,9 +345,7 @@ function closeCourseFullscreen() {
     unlockScroll();
 }
 
-/* =========================================================
-   HORARIO — tabla desktop + timeline por día en móvil
-   ========================================================= */
+/* ===== HORARIO ===== */
 
 function materiaNombre(id) {
     const list = typeof materiasDB !== "undefined" ? materiasDB : [];
@@ -185,14 +361,12 @@ function cellKey(cell) {
 function renderHorario(courseId) {
     const dbAll = typeof horariosDB !== "undefined" ? horariosDB : {};
     const rows = dbAll[courseId] || [];
-
     renderHorarioTable(rows);
     renderHorarioMobile(rows);
 }
 
 function renderHorarioTable(rows) {
     horarioBody.innerHTML = "";
-
     const skip = new Set();
     const rowspan = {};
 
@@ -217,7 +391,6 @@ function renderHorarioTable(rows) {
 
     rows.forEach((row, i) => {
         const tr = document.createElement("tr");
-
         const tdHora = document.createElement("td");
         tdHora.textContent = row.hora;
         tdHora.classList.add("hora-cell");
@@ -232,13 +405,10 @@ function renderHorarioTable(rows) {
         } else {
             days.forEach(day => {
                 if (skip.has(i + "|" + day)) return;
-
                 const cell = row[day];
                 const td = document.createElement("td");
-
                 const span = rowspan[i + "|" + day] || 1;
                 if (span > 1) td.rowSpan = span;
-
                 if (cell) {
                     td.textContent = materiaNombre(cell.materia);
                     td.classList.add("materia-cell");
@@ -247,11 +417,9 @@ function renderHorarioTable(rows) {
                     td.textContent = "Libre";
                     td.classList.add("libre-cell");
                 }
-
                 tr.appendChild(td);
             });
         }
-
         horarioBody.appendChild(tr);
     });
 }
@@ -288,7 +456,6 @@ function renderHorarioMobile(rows) {
             item.appendChild(connector);
 
             const card = document.createElement("div");
-
             if (row.tipo === "recreo") {
                 card.classList.add("timeline-card", "recreo-card");
                 card.textContent = row.label || "Recreo";
@@ -301,17 +468,23 @@ function renderHorarioMobile(rows) {
                         <div class="materia-name">${materiaNombre(cell.materia)}</div>
                         ${prof ? `<div class="prof-name">${prof.nombre}</div>` : ""}
                     `;
-                    card.addEventListener("click", () => openMateriaModal(cell.materia, cell.profesor));
+                    card.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        openMateriaModal(cell.materia, cell.profesor);
+                    });
+                    card.addEventListener("touchend", (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        openMateriaModal(cell.materia, cell.profesor);
+                    });
                 } else {
                     card.classList.add("timeline-card", "libre-card");
                     card.textContent = "Libre";
                 }
             }
-
             item.appendChild(card);
             panel.appendChild(item);
         });
-
         dayTrack.appendChild(panel);
     });
 
@@ -320,7 +493,6 @@ function renderHorarioMobile(rows) {
 
 function setupDayObserver() {
     if (dayObserver) dayObserver.disconnect();
-
     dayObserver = new IntersectionObserver(
         entries => {
             entries.forEach(entry => {
@@ -331,23 +503,10 @@ function setupDayObserver() {
         },
         { root: dayTrack, threshold: 0.6 }
     );
-
     Array.from(dayTrack.children).forEach(panel => dayObserver.observe(panel));
 }
 
-/* =========================================================
-   MODAL: MATERIA (solo nombre + profesor)
-   ========================================================= */
-
-function findMateria(id) {
-    const list = typeof materiasDB !== "undefined" ? materiasDB : [];
-    return list.find(m => m.id === id);
-}
-
-function findProfesor(id) {
-    const list = typeof profesoresDB !== "undefined" ? profesoresDB : [];
-    return list.find(p => p.id === id);
-}
+/* ===== MODAL MATERIA ===== */
 
 function setProfPhoto(url) {
     if (url) {
@@ -388,15 +547,34 @@ function openMateriaModal(materiaId, profesorId) {
 
 function closeMateriaModal() {
     materiaModalOverlay.classList.remove("active");
+    currentMateriaId = null;
     unlockScroll();
 }
 
 materiaModalClose.addEventListener("click", closeMateriaModal);
 materiaModalOverlay.addEventListener("click", e => { if (e.target === materiaModalOverlay) closeMateriaModal(); });
 
-/* =========================================================
-   GALERÍA — carrusel automático, sin control del usuario
-   ========================================================= */
+/* Dropzone */
+dropzone.addEventListener("click", () => materiaFileInput.click());
+materiaFileInput.addEventListener("change", e => subirArchivos(e.target.files));
+
+["dragenter", "dragover"].forEach(evt =>
+    dropzone.addEventListener(evt, e => {
+        e.preventDefault();
+        dropzone.classList.add("dragging");
+    })
+);
+["dragleave", "drop"].forEach(evt =>
+    dropzone.addEventListener(evt, e => {
+        e.preventDefault();
+        if (evt === "dragleave") dropzone.classList.remove("dragging");
+    })
+);
+dropzone.addEventListener("drop", e => {
+    if (e.dataTransfer.files.length) subirArchivos(e.dataTransfer.files);
+});
+
+/* ===== GALERIA ===== */
 
 function renderGaleria(courseId) {
     const dbAll = typeof galeriaDB !== "undefined" ? galeriaDB : {};
@@ -405,23 +583,21 @@ function renderGaleria(courseId) {
     galeriaTrack.style.animation = "none";
 
     if (list.length === 0) {
-        galeriaTrack.innerHTML = `<p class="galeria-empty">Sin fotos en la galería todavía</p>`;
+        galeriaTrack.innerHTML = `<p class="galeria-empty">Sin fotos en la galeria todavia</p>`;
         return;
     }
 
     const sizeClasses = ["size-a", "size-b", "size-c"];
-    const doubled = list.concat(list); // loop continuo sin salto
+    const doubled = list.concat(list);
 
     doubled.forEach((item, i) => {
         const div = document.createElement("div");
         div.classList.add("galeria-item", sizeClasses[i % sizeClasses.length]);
-
         const img = document.createElement("img");
         img.src = item.ruta;
         img.alt = "";
         img.loading = "lazy";
         div.appendChild(img);
-
         galeriaTrack.appendChild(div);
     });
 
@@ -429,43 +605,9 @@ function renderGaleria(courseId) {
     galeriaTrack.style.animation = `galeriaScroll ${duration}s linear infinite`;
 }
 
-/* =========================================================
-   LOGIN — usuario/contraseña derivados de estudiantes.js
-   (no es seguridad real, solo identifica quién sos)
-   ========================================================= */
+/* ===== LOGIN ===== */
 
-let currentUser = null; // { id, nombre }
-
-function normalizar(str) {
-    // Saca tildes, pasa a minúsculas, y deja solo letras y números
-    // (así "Álvarez" -> "alvarez", pero "quichimbo2010" conserva el año)
-    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
-}
-
-function datosLogin(estudiante) {
-    const partes = estudiante.nombre.trim().split(/\s+/);
-    const apellidosCount = partes.length >= 3 ? 2 : (partes.length === 2 ? 1 : 0);
-    const primerNombre = partes[0] || "";
-    const primerApellido = partes[partes.length - apellidosCount] || partes[partes.length - 1] || "";
-    const anio = estudiante.fechaNacimiento ? estudiante.fechaNacimiento.slice(0, 4) : "";
-
-    return {
-        username: normalizar(primerNombre + primerApellido),
-        password: normalizar(primerApellido + anio)
-    };
-}
-
-const loginBtn = document.getElementById("loginBtn");
-const userChip = document.getElementById("userChip");
-const userChipName = document.getElementById("userChipName");
-const logoutBtn = document.getElementById("logoutBtn");
-
-const loginModalOverlay = document.getElementById("loginModalOverlay");
-const loginModalClose = document.getElementById("loginModalClose");
-const loginUsername = document.getElementById("loginUsername");
-const loginPassword = document.getElementById("loginPassword");
-const loginError = document.getElementById("loginError");
-const loginSubmitBtn = document.getElementById("loginSubmitBtn");
+let currentUser = null;
 
 function updateAuthUI() {
     if (currentUser) {
@@ -476,7 +618,6 @@ function updateAuthUI() {
         loginBtn.style.display = "inline-flex";
         userChip.style.display = "none";
     }
-    updateUploadUI();
 }
 
 loginBtn.addEventListener("click", () => {
@@ -501,19 +642,16 @@ loginPassword.addEventListener("keydown", e => { if (e.key === "Enter") intentar
 function intentarLogin() {
     const u = normalizar(loginUsername.value);
     const p = normalizar(loginPassword.value);
-
     const list = typeof estudiantesDB !== "undefined" ? estudiantesDB : [];
     const match = list.find(e => {
         const creds = datosLogin(e);
         return creds.username === u && creds.password === p;
     });
-
     if (!match) {
         loginError.style.display = "block";
         return;
     }
-
-    currentUser = { id: match.id, nombre: match.nombre };
+    currentUser = { id: match.id, nombre: primerNombreCompleto(match.nombre) };
     sessionStorage.setItem("oasis_session", JSON.stringify(currentUser));
     updateAuthUI();
     closeLoginModal();
@@ -529,200 +667,38 @@ const savedSession = sessionStorage.getItem("oasis_session");
 if (savedSession) currentUser = JSON.parse(savedSession);
 updateAuthUI();
 
-/* =========================================================
-   ARCHIVOS POR MATERIA (Firebase) — dentro del modal de materia
-   ========================================================= */
-
-let currentMateriaId = null;
-
-const materiaArchivosList = document.getElementById("materiaArchivosList");
-const dropzone = document.getElementById("dropzone");
-const materiaFileInput = document.getElementById("materiaFileInput");
-const uploadLoginHint = document.getElementById("uploadLoginHint");
-
-function firebaseListo() {
-    return db !== null;
-}
-
-const MAX_FILE_SIZE = 700 * 1024; // ~700 KB, para no pasarse del límite de 1MB de Firestore
-
-function updateUploadUI() {
-    if (currentUser && firebaseListo()) {
-        dropzone.style.display = "block";
-        uploadLoginHint.style.display = "none";
-    } else {
-        dropzone.style.display = "none";
-        uploadLoginHint.style.display = "block";
-        uploadLoginHint.textContent = firebaseListo()
-            ? "Iniciá sesión para subir archivos."
-            : "Firebase todavía no está configurado.";
-    }
-}
-
-async function loadMateriaArchivos(materiaId) {
-    materiaArchivosList.innerHTML = `<p class="materia-archivos-empty">Cargando…</p>`;
-
-    if (!firebaseListo()) {
-        materiaArchivosList.innerHTML = `<p class="materia-archivos-empty">Firebase todavía no está configurado.</p>`;
-        return;
-    }
-
-    try {
-        const snap = await db.collection("archivos").where("materia", "==", materiaId).get();
-        const files = [];
-        snap.forEach(doc => files.push(doc.data()));
-        files.sort((a, b) => (b.fecha || "").localeCompare(a.fecha || ""));
-        renderMateriaArchivos(files);
-    } catch (err) {
-        console.error(err);
-        materiaArchivosList.innerHTML = `<p class="materia-archivos-empty">No se pudieron cargar los archivos.</p>`;
-    }
-}
-
-function renderMateriaArchivos(files) {
-    materiaArchivosList.innerHTML = "";
-
-    if (files.length === 0) {
-        materiaArchivosList.innerHTML = `<p class="materia-archivos-empty">Aún no hay archivos</p>`;
-        return;
-    }
-
-    files.forEach(file => {
-        const row = document.createElement("div");
-        row.classList.add("archivo-row");
-
-        row.innerHTML = `
-            <span class="archivo-icon">${FILE_ICON_SVG}</span>
-            <div class="archivo-info">
-                <a class="archivo-nombre" href="${file.data}" download="${file.nombre}">${file.nombre}</a>
-                <div class="archivo-meta">Subido por ${file.subidoPorNombre || "alguien"}</div>
-            </div>
-        `;
-
-        materiaArchivosList.appendChild(row);
-    });
-}
-
-function leerComoBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-    });
-}
-
-async function subirArchivos(files) {
-    if (!currentUser || !firebaseListo() || !currentMateriaId) return;
-
-    const demasiadoGrandes = Array.from(files).filter(f => f.size > MAX_FILE_SIZE);
-    if (demasiadoGrandes.length > 0) {
-        alert(
-            `"${demasiadoGrandes[0].name}" pesa demasiado (máximo ~700 KB por archivo, ya que se guarda directo en la base de datos sin costo). Probá comprimirlo o subir una versión más liviana.`
-        );
-        return;
-    }
-
-    dropzone.classList.add("dragging");
-    dropzone.querySelector("p").textContent = "Subiendo…";
-
-    try {
-        for (const file of Array.from(files)) {
-            const data = await leerComoBase64(file);
-
-            await db.collection("archivos").add({
-                materia: currentMateriaId,
-                curso: currentCourse,
-                nombre: file.name,
-                data,
-                subidoPorId: currentUser.id,
-                subidoPorNombre: currentUser.nombre,
-                fecha: new Date().toISOString()
-            });
-        }
-        await loadMateriaArchivos(currentMateriaId);
-    } catch (err) {
-        console.error(err);
-        alert("Hubo un error al subir el archivo. Revisá la consola (F12) para más detalle.");
-    } finally {
-        dropzone.classList.remove("dragging");
-        dropzone.querySelector("p").innerHTML = `Arrastrá un archivo acá, o <span class="dropzone-link">hacé click</span> (máx. ~700 KB)`;
-        materiaFileInput.value = "";
-    }
-}
-
-dropzone.addEventListener("click", () => materiaFileInput.click());
-materiaFileInput.addEventListener("change", e => subirArchivos(e.target.files));
-
-["dragenter", "dragover"].forEach(evt =>
-    dropzone.addEventListener(evt, e => {
-        e.preventDefault();
-        dropzone.classList.add("dragging");
-    })
-);
-["dragleave", "drop"].forEach(evt =>
-    dropzone.addEventListener(evt, e => {
-        e.preventDefault();
-        if (evt === "dragleave") dropzone.classList.remove("dragging");
-    })
-);
-dropzone.addEventListener("drop", e => {
-    if (e.dataTransfer.files.length) subirArchivos(e.dataTransfer.files);
-});
-
-/* =========================================================
-   ESTUDIANTES — carrusel, primer apellido, modal
-   ========================================================= */
-
-function primerApellido(nombreCompleto) {
-    const parts = nombreCompleto.trim().split(/\s+/);
-    if (parts.length <= 1) return parts[0] || "";
-    const apellidosCount = parts.length >= 3 ? 2 : 1;
-    const apellidos = parts.slice(parts.length - apellidosCount);
-    return apellidos[0];
-}
-
-function formatFecha(fecha) {
-    if (!fecha) return "—";
-    try {
-        const d = new Date(fecha + "T00:00:00");
-        return new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "long", year: "numeric" }).format(d);
-    } catch {
-        return fecha;
-    }
-}
+/* ===== ESTUDIANTES ===== */
 
 function renderStudentsTrack(courseId) {
     const list = (typeof estudiantesDB !== "undefined" ? estudiantesDB : []).filter(e => e.curso === courseId);
     studentsTrack.innerHTML = "";
-
     if (list.length === 0) {
-        studentsTrack.innerHTML = `<p class="students-empty">Sin estudiantes todavía</p>`;
+        studentsTrack.innerHTML = `<p class="students-empty">Sin estudiantes todavia</p>`;
         return;
     }
-
     list.forEach(s => {
         const card = document.createElement("div");
         card.classList.add("card-estudiante");
-
         const thumb = document.createElement("div");
         thumb.classList.add("thumb");
         thumb.appendChild(buildPhotoSlot(s.foto, s.nombre));
         card.appendChild(thumb);
-
         if (s.cargo) {
             const badge = document.createElement("span");
             badge.classList.add("badge-cargo");
             badge.textContent = s.cargo;
             card.appendChild(badge);
         }
-
         const apellidoEl = document.createElement("div");
         apellidoEl.classList.add("apellido");
         apellidoEl.textContent = primerApellido(s.nombre);
         card.appendChild(apellidoEl);
-
         card.addEventListener("click", () => openStudentModal(s));
+        card.addEventListener("touchend", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            openStudentModal(s);
+        });
         studentsTrack.appendChild(card);
     });
 }
@@ -743,24 +719,23 @@ function openStudentModal(s) {
         studentModalPhoto.style.display = "none";
         studentPhotoFallback.style.display = "flex";
     }
-
     studentModalName.textContent = s.nombre;
     studentModalBirth.textContent = formatFecha(s.fechaNacimiento);
-    studentModalIngles.textContent = s.nivelIngles || "—";
-    studentModalContrib.textContent = "…";
-
-    studentModalOverlay.classList.add("active");
-    lockScroll();
+    studentModalIngles.textContent = s.nivelIngles || "-";
+    studentModalContrib.textContent = "...";
 
     if (firebaseListo()) {
         db.collection("archivos").where("subidoPorId", "==", s.id).get()
             .then(snap => {
                 studentModalContrib.textContent = snap.size + (snap.size === 1 ? " archivo" : " archivos");
             })
-            .catch(() => { studentModalContrib.textContent = "—"; });
+            .catch(() => { studentModalContrib.textContent = "-"; });
     } else {
-        studentModalContrib.textContent = "—";
+        studentModalContrib.textContent = "-";
     }
+
+    studentModalOverlay.classList.add("active");
+    lockScroll();
 }
 
 function closeStudentModal() {

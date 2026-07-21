@@ -43,14 +43,14 @@ header{
     border-bottom:1px solid var(--outline);
 }
 
-.topbar{ width:90%; max-width:1100px; margin:auto; padding:16px 0; }
+.topbar{ width:90%; max-width:1100px; margin:auto; padding:16px 0; display:flex; justify-content:space-between; align-items:center; }
 
 .brand{
     color:var(--primary); letter-spacing:4px; font-weight:700;
     font-variation-settings:"wght" 700; font-size:15px;
 }
 
-/* ===== Hero (home) ===== */
+/* ===== Hero ===== */
 
 .hero{
     min-height:100vh; position:relative; overflow:hidden;
@@ -79,7 +79,7 @@ header{
 .app-card h1{ font-size:38px; font-variation-settings:"wght" 700; letter-spacing:1px; }
 .tagline{ margin-top:8px; color:var(--on-surface-var); font-size:14px; }
 
-/* ===== Carrusel genérico (cursos y estudiantes) ===== */
+/* ===== Carrusel ===== */
 
 .cards-section{ padding:110px 8% 60px; text-align:center; }
 
@@ -113,8 +113,10 @@ header{
     width:300px; min-width:300px; flex-shrink:0;
     background:var(--surface-1); border:1px solid var(--outline);
     border-radius:var(--radius-xl); overflow:hidden; cursor:pointer; transition:.3s;
+    -webkit-tap-highlight-color:transparent;
 }
 .card:hover{ transform:translateY(-8px); border-color:var(--primary); }
+.card:active{ transform:translateY(-4px); }
 .card .thumb{ position:relative; height:200px; overflow:hidden; }
 .card .thumb img{ width:100%; height:100%; object-fit:cover; filter:saturate(.85) brightness(.8); }
 .card .thumb::after{
@@ -128,13 +130,14 @@ header{
 
 .courses-empty{ color:var(--on-surface-var); font-size:14px; font-style:italic; padding:20px; }
 
-/* ===== Tarjetas de estudiante (carrusel) ===== */
+/* ===== Tarjetas de estudiante ===== */
 
 .card-estudiante{
     position:relative;
     width:150px; min-width:150px; flex-shrink:0;
     background:var(--surface-1); border:1px solid var(--outline);
     border-radius:var(--radius-lg); overflow:hidden; cursor:pointer; transition:.3s;
+    -webkit-tap-highlight-color:transparent;
 }
 .card-estudiante:hover{ transform:translateY(-6px); border-color:var(--primary); }
 .card-estudiante .thumb{ height:150px; overflow:hidden; }
@@ -149,7 +152,7 @@ header{
 
 .students-empty{ color:var(--on-surface-var); font-size:14px; font-style:italic; padding:20px; }
 
-/* ===== Foto o fallback "No Photo" ===== */
+/* ===== Foto o fallback ===== */
 
 .photo-slot{ width:100%; height:100%; }
 .photo-slot img{ width:100%; height:100%; object-fit:cover; display:block; }
@@ -170,7 +173,7 @@ header{
 .prof-photo{ width:52px; height:52px; border-radius:50%; object-fit:cover; }
 .prof-photo.no-photo{ font-size:0; }
 
-/* ===== Separador de sección ===== */
+/* ===== Separador ===== */
 
 .divider-pill{
     width:64px; height:6px; border-radius:var(--radius-full);
@@ -178,7 +181,7 @@ header{
     margin:18px auto 0;
 }
 
-/* ===== Sobre la academia ===== */
+/* ===== About ===== */
 
 .about{ text-align:center; padding:110px 15%; background:var(--surface); }
 .about h2{ font-size:38px; font-variation-settings:"wght" 700; }
@@ -197,6 +200,7 @@ footer{ text-align:center; padding:34px; background:var(--bg); border-top:1px so
     background:var(--bg); overflow-y:auto; overscroll-behavior:contain;
     transform:translateY(24px); opacity:0; pointer-events:none;
     transition:.35s ease;
+    -webkit-overflow-scrolling:touch;
 }
 .course-fullscreen.active{ transform:translateY(0); opacity:1; pointer-events:all; }
 
@@ -220,8 +224,10 @@ footer{ text-align:center; padding:34px; background:var(--bg); border-top:1px so
     background:var(--surface-3); border:none; color:var(--on-surface);
     display:flex; align-items:center; justify-content:center;
     cursor:pointer; transition:.2s;
+    -webkit-tap-highlight-color:transparent;
 }
 .fs-back:hover{ background:var(--primary-container); color:var(--on-primary-container); }
+.fs-back:active{ background:var(--primary-container); }
 .fs-back svg{ width:18px; height:18px; }
 
 .fs-topbar-title{
@@ -256,11 +262,12 @@ table.horario td{
 }
 table.horario td.hora-cell{ background:var(--surface-1); color:var(--on-surface-var); font-variation-settings:"wght" 600; }
 table.horario td.recreo-cell{ background:var(--tertiary-container); color:#ffffff; font-variation-settings:"wght" 600; }
-table.horario td.materia-cell{ cursor:pointer; transition:.2s; }
+table.horario td.materia-cell{ cursor:pointer; transition:.2s; -webkit-tap-highlight-color:transparent; }
 table.horario td.materia-cell:hover{ background:var(--primary-container); color:var(--on-primary-container); }
+table.horario td.materia-cell:active{ background:var(--primary-container); color:var(--on-primary-container); }
 table.horario td.libre-cell{ color:var(--on-surface-var); font-style:italic; font-size:12px; }
 
-/* ===== Horario por día (móvil) — timeline vertical ===== */
+/* ===== Horario por dia (movil) ===== */
 
 .horario-mobile{ display:none; }
 
@@ -270,6 +277,7 @@ table.horario td.libre-cell{ color:var(--on-surface-var); font-style:italic; fon
 .day-tab{
     flex:1; background:none; border:none; color:var(--on-surface-var);
     padding:10px 2px 12px; font-size:12px; cursor:pointer; position:relative; transition:.2s;
+    -webkit-tap-highlight-color:transparent;
 }
 .day-tab.active{ color:var(--primary); font-variation-settings:"wght" 700; }
 .day-tab.active::after{
@@ -298,8 +306,9 @@ table.horario td.libre-cell{ color:var(--on-surface-var); font-style:italic; fon
     flex:1; background:var(--surface-3); border-radius:var(--radius-lg);
     padding:13px 16px; margin-bottom:14px; transition:.2s;
 }
-.timeline-card.clickable{ cursor:pointer; }
+.timeline-card.clickable{ cursor:pointer; -webkit-tap-highlight-color:transparent; }
 .timeline-card.clickable:hover{ background:var(--primary-container); color:var(--on-primary-container); }
+.timeline-card.clickable:active{ background:var(--primary-container); color:var(--on-primary-container); }
 .timeline-card .materia-name{ font-size:14px; font-variation-settings:"wght" 600; }
 .timeline-card .prof-name{ font-size:11px; color:var(--on-surface-var); margin-top:3px; }
 .timeline-card.clickable:hover .prof-name{ color:var(--on-primary-container); opacity:.8; }
@@ -314,7 +323,7 @@ table.horario td.libre-cell{ color:var(--on-surface-var); font-style:italic; fon
     font-variation-settings:"wght" 600; display:flex; align-items:center; justify-content:center;
 }
 
-/* ===== Galería (carrusel automático) ===== */
+/* ===== Galeria ===== */
 
 .galeria-viewport{
     overflow:hidden; width:100%; padding:10px 0 20px;
@@ -324,7 +333,6 @@ table.horario td.libre-cell{ color:var(--on-surface-var); font-style:italic; fon
 
 .galeria-track{
     display:flex; align-items:flex-end; gap:18px; width:max-content;
-    animation:galeriaScroll 45s linear infinite;
 }
 
 .galeria-viewport:hover .galeria-track{ animation-play-state:paused; }
@@ -346,36 +354,7 @@ table.horario td.libre-cell{ color:var(--on-surface-var); font-style:italic; fon
 
 .galeria-empty{ width:100%; color:var(--on-surface-var); font-size:14px; font-style:italic; text-align:center; padding:10px 0 20px; }
 
-/* ===== Archivos (grid de tarjetas) ===== */
-
-.archivos-grid{
-    display:grid; grid-template-columns:repeat(auto-fill, minmax(130px, 1fr)); gap:14px;
-}
-
-.file-card{
-    background:var(--surface-1); border:1px solid var(--outline); border-radius:var(--radius-lg);
-    padding:20px 12px 16px; display:flex; flex-direction:column; align-items:center; text-align:center;
-    gap:10px; text-decoration:none; color:var(--on-surface); transition:.25s;
-}
-.file-card:hover{ border-color:var(--primary); background:var(--surface-2); transform:translateY(-4px); }
-
-.file-card-icon{
-    width:44px; height:44px; border-radius:var(--radius-full);
-    background:var(--primary-container); color:var(--on-primary-container);
-    display:flex; align-items:center; justify-content:center; flex-shrink:0;
-}
-.file-card-icon svg{ width:19px; height:19px; }
-
-.file-card-name{
-    font-size:12px; width:100%;
-    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-}
-
-.file-card-ext{ font-size:9px; letter-spacing:1.5px; color:var(--on-surface-var); text-transform:uppercase; }
-
-.archivos-empty{ grid-column:1/-1; color:var(--on-surface-var); font-size:14px; font-style:italic; padding:20px; text-align:center; }
-
-/* ===== Modales (estudiante / materia) ===== */
+/* ===== Mini modales ===== */
 
 .mini-overlay{
     position:fixed; inset:0; background:rgba(10,9,12,.72); backdrop-filter:blur(8px);
@@ -406,34 +385,9 @@ table.horario td.libre-cell{ color:var(--on-surface-var); font-style:italic; fon
 }
 .materia-profesor span{ font-size:15px; text-align:left; }
 
-/* ===== Auth (header) ===== */
+.mini-subhead{ margin-top:20px; text-align:left; font-size:12px; letter-spacing:1px; text-transform:uppercase; color:var(--tertiary); }
 
-.auth{ display:flex; align-items:center; }
-
-.user-chip{
-    display:flex; align-items:center; gap:10px;
-    background:var(--surface-1); border:1px solid var(--outline);
-    padding:7px 14px 7px 16px; border-radius:var(--radius-full); font-size:13px;
-}
-.user-chip button{ background:none; border:none; color:var(--on-surface-var); cursor:pointer; display:flex; }
-.user-chip button svg{ width:15px; height:15px; }
-.user-chip button:hover{ color:#ff8a8a; }
-
-/* ===== Login ===== */
-
-.login-form{ display:flex; flex-direction:column; gap:12px; margin-top:22px; text-align:left; }
-
-.login-form input{
-    background:var(--surface-1); border:1px solid var(--outline);
-    border-radius:var(--radius-lg); padding:12px 14px; color:var(--on-surface);
-    font-family:inherit; font-size:14px;
-}
-.login-form input::placeholder{ color:var(--on-surface-var); }
-
-.login-error{ color:#ff8a8a; font-size:12.5px; text-align:center; }
-
-/* ===== Archivos por materia (lista, dentro del modal) ===== */
-
+/* Archivos dentro del modal de materia */
 .materia-archivos-list{ display:flex; flex-direction:column; gap:8px; margin-top:10px; text-align:left; }
 
 .archivo-row{
@@ -466,16 +420,57 @@ table.horario td.libre-cell{ color:var(--on-surface-var); font-style:italic; fon
 
 .login-hint{ margin-top:14px; font-size:12px; color:var(--on-surface-var); font-style:italic; text-align:center; }
 
+/* ===== Auth ===== */
+
+.auth{ display:flex; align-items:center; }
+
+.user-chip{
+    display:flex; align-items:center; gap:10px;
+    background:var(--surface-1); border:1px solid var(--outline);
+    padding:7px 14px 7px 16px; border-radius:var(--radius-full); font-size:13px;
+}
+.user-chip button{ background:none; border:none; color:var(--on-surface-var); cursor:pointer; display:flex; }
+.user-chip button svg{ width:15px; height:15px; }
+.user-chip button:hover{ color:#ff8a8a; }
+
+/* ===== Botones ===== */
+
+.btn-filled{
+    background:var(--primary); color:var(--on-primary);
+    border:none; border-radius:var(--radius-full);
+    padding:12px 24px; font-family:inherit; font-size:14px;
+    font-variation-settings:"wght" 600; cursor:pointer; transition:.25s;
+}
+.btn-filled:hover{ background:var(--primary-container); color:var(--on-primary-container); }
+.btn-filled.small{ padding:8px 16px; font-size:12px; }
+
+/* ===== Login ===== */
+
+.login-form{ display:flex; flex-direction:column; gap:12px; margin-top:22px; text-align:left; }
+
+.login-form input{
+    background:var(--surface-1); border:1px solid var(--outline);
+    border-radius:var(--radius-lg); padding:12px 14px; color:var(--on-surface);
+    font-family:inherit; font-size:14px;
+}
+.login-form input::placeholder{ color:var(--on-surface-var); }
+
+.login-error{ color:#ff8a8a; font-size:12.5px; text-align:center; }
+
+/* ===== Modal close ===== */
+
 .modal-close{
     position:absolute; top:20px; right:20px; width:36px; height:36px;
     border-radius:var(--radius-full); background:var(--surface-3); border:none;
     color:var(--on-surface); display:flex; align-items:center; justify-content:center;
     cursor:pointer; transition:.25s;
+    -webkit-tap-highlight-color:transparent;
 }
 .modal-close svg{ width:18px; height:18px; }
 .modal-close:hover{ background:var(--primary-container); color:var(--on-primary-container); }
+.modal-close:active{ background:var(--primary-container); color:var(--on-primary-container); }
 
-/* ===== Accesibilidad y responsive ===== */
+/* ===== Responsive ===== */
 
 @media(prefers-reduced-motion: reduce){
     .glow, .galeria-track{ animation:none; }
@@ -504,7 +499,6 @@ table.horario td.libre-cell{ color:var(--on-surface-var); font-style:italic; fon
     .nav-btn{ display:none; }
     .cards,
     .cards-estudiantes{ padding:6px; }
-
     table.horario{ display:none; }
     .horario-mobile{ display:block; }
 }
