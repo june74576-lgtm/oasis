@@ -30,9 +30,6 @@ const firebaseConfig = {
 
 let db = null;
 
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-
 if (!firebaseConfig.apiKey.includes("AIzaSyANuIq0Te9cuLg5w5AFqa2wpXxVLR0sVZI") && window.firebase) {
     firebase.initializeApp(firebaseConfig);
     db = firebase.firestore();
@@ -44,12 +41,11 @@ if (!firebaseConfig.apiKey.includes("AIzaSyANuIq0Te9cuLg5w5AFqa2wpXxVLR0sVZI") &
 ===== Reglas de Firestore (pestaña "Rules") =====
 
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /archivos/{doc} {
-      allow read: if true;
-      allow create: if request.resource.data.size() < 1000000;
-      allow update, delete: if false;
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
