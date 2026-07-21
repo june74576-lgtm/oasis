@@ -59,7 +59,6 @@ const horarioBody = document.getElementById("horarioBody");
 const dayTabs = document.getElementById("dayTabs");
 const dayTrack = document.getElementById("dayTrack");
 
-const fileListEl = document.getElementById("fileList");
 const galeriaTrack = document.getElementById("galeriaTrack");
 
 const coursesTrack = document.getElementById("coursesTrack");
@@ -77,6 +76,7 @@ const studentPhotoFallback = document.getElementById("studentPhotoFallback");
 const studentModalName = document.getElementById("studentModalName");
 const studentModalBirth = document.getElementById("studentModalBirth");
 const studentModalIngles = document.getElementById("studentModalIngles");
+const studentModalContrib = document.getElementById("studentModalContrib");
 
 const materiaModalOverlay = document.getElementById("materiaModalOverlay");
 const materiaModalClose = document.getElementById("materiaModalClose");
@@ -155,7 +155,6 @@ function openCourseFullscreen(courseId) {
     renderHorario(courseId);
     renderStudentsTrack(courseId);
     renderGaleria(courseId);
-    renderArchivos(courseId);
 
     courseFullscreen.classList.add("active");
     courseFullscreen.scrollTop = 0;
@@ -369,6 +368,7 @@ function openMateriaModal(materiaId, profesorId) {
     const materia = findMateria(materiaId);
     const profesor = findProfesor(profesorId);
 
+    currentMateriaId = materiaId;
     materiaModalNombre.textContent = materia ? materia.nombre : materiaId;
 
     if (profesor) {
@@ -378,6 +378,9 @@ function openMateriaModal(materiaId, profesorId) {
         setProfPhoto("");
         materiaModalProfNombre.textContent = "Profesor sin asignar";
     }
+
+    loadMateriaArchivos(materiaId);
+    updateUploadUI();
 
     materiaModalOverlay.classList.add("active");
     lockScroll();
@@ -427,49 +430,245 @@ function renderGaleria(courseId) {
 }
 
 /* =========================================================
-   ARCHIVOS — grid de tarjetas
+   LOGIN — usuario/contraseña derivados de estudiantes.js
+   (no es seguridad real, solo identifica quién sos)
    ========================================================= */
 
-function getFileExt(nombre) {
-    const parts = nombre.split(".");
-    return parts.length > 1 ? parts.pop().toUpperCase() : "";
+let currentUser = null; // { id, nombre }
+
+function normalizar(str) {
+    // Saca tildes, pasa a minúsculas, y deja solo letras y números
+    // (así "Álvarez" -> "alvarez", pero "quichimbo2010" conserva el año)
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 
-function renderArchivos(courseId) {
-    const dbAll = typeof archivosDB !== "undefined" ? archivosDB : {};
-    const list = dbAll[courseId] || [];
-    fileListEl.innerHTML = "";
+function datosLogin(estudiante) {
+    const partes = estudiante.nombre.trim().split(/\s+/);
+    const apellidosCount = partes.length >= 3 ? 2 : (partes.length === 2 ? 1 : 0);
+    const primerNombre = partes[0] || "";
+    const primerApellido = partes[partes.length - apellidosCount] || partes[partes.length - 1] || "";
+    const anio = estudiante.fechaNacimiento ? estudiante.fechaNacimiento.slice(0, 4) : "";
 
-    if (list.length === 0) {
-        fileListEl.innerHTML = `<p class="archivos-empty">Aún no hay archivos</p>`;
+    return {
+        username: normalizar(primerNombre + primerApellido),
+        password: normalizar(primerApellido + anio)
+    };
+}
+
+const loginBtn = document.getElementById("loginBtn");
+const userChip = document.getElementById("userChip");
+const userChipName = document.getElementById("userChipName");
+const logoutBtn = document.getElementById("logoutBtn");
+
+const loginModalOverlay = document.getElementById("loginModalOverlay");
+const loginModalClose = document.getElementById("loginModalClose");
+const loginUsername = document.getElementById("loginUsername");
+const loginPassword = document.getElementById("loginPassword");
+const loginError = document.getElementById("loginError");
+const loginSubmitBtn = document.getElementById("loginSubmitBtn");
+
+function updateAuthUI() {
+    if (currentUser) {
+        loginBtn.style.display = "none";
+        userChip.style.display = "flex";
+        userChipName.textContent = currentUser.nombre;
+    } else {
+        loginBtn.style.display = "inline-flex";
+        userChip.style.display = "none";
+    }
+    updateUploadUI();
+}
+
+loginBtn.addEventListener("click", () => {
+    loginError.style.display = "none";
+    loginUsername.value = "";
+    loginPassword.value = "";
+    loginModalOverlay.classList.add("active");
+    lockScroll();
+});
+
+function closeLoginModal() {
+    loginModalOverlay.classList.remove("active");
+    unlockScroll();
+}
+
+loginModalClose.addEventListener("click", closeLoginModal);
+loginModalOverlay.addEventListener("click", e => { if (e.target === loginModalOverlay) closeLoginModal(); });
+
+loginSubmitBtn.addEventListener("click", intentarLogin);
+loginPassword.addEventListener("keydown", e => { if (e.key === "Enter") intentarLogin(); });
+
+function intentarLogin() {
+    const u = normalizar(loginUsername.value);
+    const p = normalizar(loginPassword.value);
+
+    const list = typeof estudiantesDB !== "undefined" ? estudiantesDB : [];
+    const match = list.find(e => {
+        const creds = datosLogin(e);
+        return creds.username === u && creds.password === p;
+    });
+
+    if (!match) {
+        loginError.style.display = "block";
         return;
     }
 
-    list.forEach(file => {
-        const link = document.createElement("a");
-        link.classList.add("file-card");
-        link.href = file.ruta;
-        link.target = "_blank";
-        link.rel = "noopener";
+    currentUser = { id: match.id, nombre: match.nombre };
+    sessionStorage.setItem("oasis_session", JSON.stringify(currentUser));
+    updateAuthUI();
+    closeLoginModal();
+}
 
-        const icon = document.createElement("div");
-        icon.classList.add("file-card-icon");
-        icon.innerHTML = FILE_ICON_SVG;
+logoutBtn.addEventListener("click", () => {
+    currentUser = null;
+    sessionStorage.removeItem("oasis_session");
+    updateAuthUI();
+});
 
-        const name = document.createElement("span");
-        name.classList.add("file-card-name");
-        name.textContent = file.nombre.replace(/\.[^/.]+$/, "");
+const savedSession = sessionStorage.getItem("oasis_session");
+if (savedSession) currentUser = JSON.parse(savedSession);
+updateAuthUI();
 
-        const ext = document.createElement("span");
-        ext.classList.add("file-card-ext");
-        ext.textContent = getFileExt(file.nombre);
+/* =========================================================
+   ARCHIVOS POR MATERIA (Firebase) — dentro del modal de materia
+   ========================================================= */
 
-        link.appendChild(icon);
-        link.appendChild(name);
-        link.appendChild(ext);
-        fileListEl.appendChild(link);
+let currentMateriaId = null;
+
+const materiaArchivosList = document.getElementById("materiaArchivosList");
+const dropzone = document.getElementById("dropzone");
+const materiaFileInput = document.getElementById("materiaFileInput");
+const uploadLoginHint = document.getElementById("uploadLoginHint");
+
+function firebaseListo() {
+    return db !== null;
+}
+
+const MAX_FILE_SIZE = 700 * 1024; // ~700 KB, para no pasarse del límite de 1MB de Firestore
+
+function updateUploadUI() {
+    if (currentUser && firebaseListo()) {
+        dropzone.style.display = "block";
+        uploadLoginHint.style.display = "none";
+    } else {
+        dropzone.style.display = "none";
+        uploadLoginHint.style.display = "block";
+        uploadLoginHint.textContent = firebaseListo()
+            ? "Iniciá sesión para subir archivos."
+            : "Firebase todavía no está configurado.";
+    }
+}
+
+async function loadMateriaArchivos(materiaId) {
+    materiaArchivosList.innerHTML = `<p class="materia-archivos-empty">Cargando…</p>`;
+
+    if (!firebaseListo()) {
+        materiaArchivosList.innerHTML = `<p class="materia-archivos-empty">Firebase todavía no está configurado.</p>`;
+        return;
+    }
+
+    try {
+        const snap = await db.collection("archivos").where("materia", "==", materiaId).get();
+        const files = [];
+        snap.forEach(doc => files.push(doc.data()));
+        files.sort((a, b) => (b.fecha || "").localeCompare(a.fecha || ""));
+        renderMateriaArchivos(files);
+    } catch (err) {
+        console.error(err);
+        materiaArchivosList.innerHTML = `<p class="materia-archivos-empty">No se pudieron cargar los archivos.</p>`;
+    }
+}
+
+function renderMateriaArchivos(files) {
+    materiaArchivosList.innerHTML = "";
+
+    if (files.length === 0) {
+        materiaArchivosList.innerHTML = `<p class="materia-archivos-empty">Aún no hay archivos</p>`;
+        return;
+    }
+
+    files.forEach(file => {
+        const row = document.createElement("div");
+        row.classList.add("archivo-row");
+
+        row.innerHTML = `
+            <span class="archivo-icon">${FILE_ICON_SVG}</span>
+            <div class="archivo-info">
+                <a class="archivo-nombre" href="${file.data}" download="${file.nombre}">${file.nombre}</a>
+                <div class="archivo-meta">Subido por ${file.subidoPorNombre || "alguien"}</div>
+            </div>
+        `;
+
+        materiaArchivosList.appendChild(row);
     });
 }
+
+function leerComoBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+async function subirArchivos(files) {
+    if (!currentUser || !firebaseListo() || !currentMateriaId) return;
+
+    const demasiadoGrandes = Array.from(files).filter(f => f.size > MAX_FILE_SIZE);
+    if (demasiadoGrandes.length > 0) {
+        alert(
+            `"${demasiadoGrandes[0].name}" pesa demasiado (máximo ~700 KB por archivo, ya que se guarda directo en la base de datos sin costo). Probá comprimirlo o subir una versión más liviana.`
+        );
+        return;
+    }
+
+    dropzone.classList.add("dragging");
+    dropzone.querySelector("p").textContent = "Subiendo…";
+
+    try {
+        for (const file of Array.from(files)) {
+            const data = await leerComoBase64(file);
+
+            await db.collection("archivos").add({
+                materia: currentMateriaId,
+                curso: currentCourse,
+                nombre: file.name,
+                data,
+                subidoPorId: currentUser.id,
+                subidoPorNombre: currentUser.nombre,
+                fecha: new Date().toISOString()
+            });
+        }
+        await loadMateriaArchivos(currentMateriaId);
+    } catch (err) {
+        console.error(err);
+        alert("Hubo un error al subir el archivo. Revisá la consola (F12) para más detalle.");
+    } finally {
+        dropzone.classList.remove("dragging");
+        dropzone.querySelector("p").innerHTML = `Arrastrá un archivo acá, o <span class="dropzone-link">hacé click</span> (máx. ~700 KB)`;
+        materiaFileInput.value = "";
+    }
+}
+
+dropzone.addEventListener("click", () => materiaFileInput.click());
+materiaFileInput.addEventListener("change", e => subirArchivos(e.target.files));
+
+["dragenter", "dragover"].forEach(evt =>
+    dropzone.addEventListener(evt, e => {
+        e.preventDefault();
+        dropzone.classList.add("dragging");
+    })
+);
+["dragleave", "drop"].forEach(evt =>
+    dropzone.addEventListener(evt, e => {
+        e.preventDefault();
+        if (evt === "dragleave") dropzone.classList.remove("dragging");
+    })
+);
+dropzone.addEventListener("drop", e => {
+    if (e.dataTransfer.files.length) subirArchivos(e.dataTransfer.files);
+});
 
 /* =========================================================
    ESTUDIANTES — carrusel, primer apellido, modal
@@ -548,9 +747,20 @@ function openStudentModal(s) {
     studentModalName.textContent = s.nombre;
     studentModalBirth.textContent = formatFecha(s.fechaNacimiento);
     studentModalIngles.textContent = s.nivelIngles || "—";
+    studentModalContrib.textContent = "…";
 
     studentModalOverlay.classList.add("active");
     lockScroll();
+
+    if (firebaseListo()) {
+        db.collection("archivos").where("subidoPorId", "==", s.id).get()
+            .then(snap => {
+                studentModalContrib.textContent = snap.size + (snap.size === 1 ? " archivo" : " archivos");
+            })
+            .catch(() => { studentModalContrib.textContent = "—"; });
+    } else {
+        studentModalContrib.textContent = "—";
+    }
 }
 
 function closeStudentModal() {

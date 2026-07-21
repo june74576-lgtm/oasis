@@ -16,6 +16,17 @@
 <header>
     <div class="topbar">
         <span class="brand">OASIS</span>
+
+        <div class="auth" id="authArea">
+            <button class="btn-filled small" id="loginBtn">Iniciar sesión</button>
+
+            <div class="user-chip" id="userChip" style="display:none;">
+                <span id="userChipName"></span>
+                <button id="logoutBtn" aria-label="Salir">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+                </button>
+            </div>
+        </div>
     </div>
 </header>
 
@@ -158,16 +169,6 @@
             </div>
         </section>
 
-        <!-- Archivos -->
-        <section class="fs-section">
-            <div class="fs-section-header">
-                <h2>Archivos</h2>
-                <div class="divider-pill"></div>
-            </div>
-
-            <div class="archivos-grid" id="fileList"></div>
-        </section>
-
     </div>
 </div>
 
@@ -187,6 +188,7 @@
         <div class="mini-details">
             <p><span>Nacimiento</span><strong id="studentModalBirth">—</strong></p>
             <p><span>Nivel de inglés</span><strong id="studentModalIngles">—</strong></p>
+            <p><span>Contribuciones</span><strong id="studentModalContrib">—</strong></p>
         </div>
     </div>
 </div>
@@ -206,14 +208,42 @@
             </div>
             <span id="materiaModalProfNombre"></span>
         </div>
+
+        <p class="mini-subhead">Archivos</p>
+        <div class="materia-archivos-list" id="materiaArchivosList"></div>
+
+        <div class="dropzone" id="dropzone" style="display:none;">
+            <input type="file" id="materiaFileInput" multiple hidden>
+            <p>Arrastrá un archivo acá, o <span class="dropzone-link">hacé click</span> (máx. ~700 KB)</p>
+        </div>
+        <p class="login-hint" id="uploadLoginHint">Iniciá sesión para subir archivos.</p>
     </div>
 </div>
 
+<!-- Modal: login -->
+<div class="mini-overlay" id="loginModalOverlay">
+    <div class="mini-modal">
+        <button class="modal-close" id="loginModalClose" aria-label="Cerrar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+        <h3>Iniciar sesión</h3>
+
+        <div class="login-form">
+            <input type="text" id="loginUsername" placeholder="Usuario" autocomplete="username">
+            <input type="password" id="loginPassword" placeholder="Contraseña" autocomplete="current-password">
+            <p class="login-error" id="loginError" style="display:none;">Usuario o contraseña incorrectos</p>
+            <button id="loginSubmitBtn" class="btn-filled">Entrar</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="data/firebase-config.js"></script>
 <script src="data/cursos.js"></script>
 <script src="data/profesores.js"></script>
 <script src="data/materias.js"></script>
 <script src="data/horarios.js"></script>
-<script src="data/archivos.js"></script>
 <script src="data/galeria.js"></script>
 <script src="data/estudiantes.js"></script>
 <script src="script.js"></script>
