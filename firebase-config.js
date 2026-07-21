@@ -15,17 +15,23 @@
 // archivos se guardan como texto dentro de Firestore, con un límite de
 // ~700 KB por archivo (para PDFs livianos y documentos de texto anda
 // perfecto; para archivos muy pesados con muchas imágenes, no entra).
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyANuIq0Te9cuLg5w5AFqa2wpXxVLR0sVZI",
-    authDomain: "oasis-548cf.firebaseapp.com",
-    projectId: "oasis-548cf",
-    storageBucket: "oasis-548cf.firebasestorage.app",
-    messagingSenderId: "604369694270",
-    appId: "1:604369694270:web:a46f693c06ab6879172b6f"
+  apiKey: "AIzaSyANuIq0Te9cuLg5w5AFqa2wpXxVLR0sVZI",
+  authDomain: "oasis-548cf.firebaseapp.com",
+  projectId: "oasis-548cf",
+  storageBucket: "oasis-548cf.firebasestorage.app",
+  messagingSenderId: "604369694270",
+  appId: "1:604369694270:web:a46f693c06ab6879172b6f",
+  measurementId: "G-DRWKJNJ85L"
 };
 
 let db = null;
+
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 
 if (!firebaseConfig.apiKey.includes("AIzaSyANuIq0Te9cuLg5w5AFqa2wpXxVLR0sVZI") && window.firebase) {
     firebase.initializeApp(firebaseConfig);
