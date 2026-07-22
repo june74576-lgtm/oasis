@@ -7,7 +7,6 @@ const FILE_ICON_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor
 
 let currentCourse = null;
 let currentMateriaId = null;
-let dayObserver = null;
 
 /* ===== Bloqueo de scroll ===== */
 
@@ -155,27 +154,29 @@ function formatFecha(fecha) {
     } catch { return fecha; }
 }
 
-/* ===== FIREBASE ===== */
+/* ===== SUPABASE ===== */
 
-function firebaseListo() {
-    // db se define en el head del HTML (inline)
-    return typeof db !== "undefined" && db !== null;
+function supabaseListo() {
+    return typeof supabase !== "undefined" && supabase !== null;
 }
 
-const MAX_FILE_SIZE = 700 * 1024;
+const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB (límite del plan gratis de Supabase)
 
 async function loadMateriaArchivos(materiaId) {
     materiaArchivosList.innerHTML = `<p class="materia-archivos-empty">Cargando...</p>`;
-    if (!firebaseListo()) {
-        materiaArchivosList.innerHTML = `<p class="materia-archivos-empty">Firebase no configurado.</p>`;
+    if (!supabaseListo()) {
+        materiaArchivosList.innerHTML = `<p class="materia-archivos-empty">Supabase no configurado.</p>`;
         return;
     }
     try {
-        const snap = await db.collection("archivos").where("materia", "==", materiaId).get();
-        const files = [];
-        snap.forEach(doc => files.push(doc.data()));
-        files.sort((a, b) => (b.fecha || "").localeCompare(a.fecha || ""));
-        renderMateriaArchivos(files);
+        const { data, error } = await supabase
+            .from("archivos")
+            .select("*")
+            .eq("materia", materiaId)
+            .order("fecha", { ascending: false });
+
+        if (error) throw error;
+        renderMateriaArchivos(data || []);
     } catch (err) {
         console.error("Error cargando archivos:", err);
         materiaArchivosList.innerHTML = `<p class="materia-archivos-empty">Error al cargar archivos.</p>`;
@@ -189,72 +190,104 @@ function renderMateriaArchivos(files) {
         return;
     }
     files.forEach(file => {
+        const { data: urlData } = supabase.storage.from("archivos").getPublicUrl(file.storage_path);
+        const url = urlData.publicUrl;
+
         const row = document.createElement("div");
         row.classList.add("archivo-row");
-        const subidoPor = file.subidoPorNombre ? `Subido por ${file.subidoPorNombre}` : "";
+        const subidoPor = file.subido_por_nombre ? `Subido por ${file.subido_por_nombre}` : "";
+
+        const puedeBorrar = currentUser && currentUser.id === file.subido_por_id;
+
         row.innerHTML = `
             <span class="archivo-icon">${FILE_ICON_SVG}</span>
             <div class="archivo-info">
-                <a class="archivo-nombre" href="${file.data}" download="${file.nombre}">${file.nombre}</a>
+                <a class="archivo-nombre" href="${url}" target="_blank" rel="noopener">${file.nombre}</a>
                 ${subidoPor ? `<div class="archivo-meta">${subidoPor}</div>` : ""}
             </div>
+            ${puedeBorrar ? `<button class="archivo-delete" aria-label="Borrar archivo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+            </button>` : ""}
         `;
+
+        if (puedeBorrar) {
+            row.querySelector(".archivo-delete").addEventListener("click", () => borrarArchivo(file));
+        }
+
         materiaArchivosList.appendChild(row);
     });
 }
 
-function leerComoBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-    });
+async function borrarArchivo(file) {
+    if (!confirm(`¿Borrar "${file.nombre}"?`)) return;
+
+    try {
+        await supabase.storage.from("archivos").remove([file.storage_path]);
+        const { error } = await supabase.from("archivos").delete().eq("id", file.id);
+        if (error) throw error;
+        await loadMateriaArchivos(currentMateriaId);
+    } catch (err) {
+        console.error(err);
+        alert("No se pudo borrar el archivo.");
+    }
+}
+
+function rutaSegura(nombre) {
+    // Supabase Storage no acepta ciertos caracteres/espacios sin problemas raros,
+    // así que limpiamos el nombre para el path (el nombre original se guarda aparte).
+    return nombre
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-zA-Z0-9._-]/g, "_");
 }
 
 async function subirArchivos(files) {
-    if (!currentUser || !firebaseListo() || !currentMateriaId) return;
+    if (!currentUser || !supabaseListo() || !currentMateriaId) return;
     const demasiadoGrandes = Array.from(files).filter(f => f.size > MAX_FILE_SIZE);
     if (demasiadoGrandes.length > 0) {
-        alert(`"${demasiadoGrandes[0].name}" pesa demasiado (maximo ~700 KB).`);
+        alert(`"${demasiadoGrandes[0].name}" pesa demasiado (máximo 50 MB).`);
         return;
     }
     dropzone.classList.add("dragging");
     dropzone.querySelector("p").textContent = "Subiendo...";
     try {
         for (const file of Array.from(files)) {
-            const data = await leerComoBase64(file);
-            await db.collection("archivos").add({
+            const path = `${currentMateriaId}/${Date.now()}_${rutaSegura(file.name)}`;
+
+            const { error: uploadError } = await supabase.storage.from("archivos").upload(path, file);
+            if (uploadError) throw uploadError;
+
+            const { error: insertError } = await supabase.from("archivos").insert({
                 materia: currentMateriaId,
                 curso: currentCourse,
                 nombre: file.name,
-                data,
-                subidoPorId: currentUser.id,
-                subidoPorNombre: currentUser.nombre,
+                storage_path: path,
+                subido_por_id: currentUser.id,
+                subido_por_nombre: currentUser.nombre,
                 fecha: new Date().toISOString()
             });
+            if (insertError) throw insertError;
         }
         await loadMateriaArchivos(currentMateriaId);
     } catch (err) {
         console.error(err);
-        alert("Error al subir. Revisa la consola (F12).");
+        alert("Error al subir. Revisá la consola (F12).");
     } finally {
         dropzone.classList.remove("dragging");
-        dropzone.querySelector("p").innerHTML = `Arrastra un archivo aca, o <span class="dropzone-link">hace click</span> (max. ~700 KB)`;
+        dropzone.querySelector("p").innerHTML = `Arrastrá un archivo acá, o <span class="dropzone-link">hacé click</span> (máx. 50 MB)`;
         materiaFileInput.value = "";
     }
 }
 
 function updateUploadUI() {
-    if (currentUser && firebaseListo()) {
+    if (currentUser && supabaseListo()) {
         dropzone.style.display = "block";
         uploadLoginHint.style.display = "none";
     } else {
         dropzone.style.display = "none";
         uploadLoginHint.style.display = "block";
-        uploadLoginHint.textContent = firebaseListo()
-            ? "Inicia sesion para subir archivos."
-            : "Firebase todavia no esta configurado.";
+        uploadLoginHint.textContent = supabaseListo()
+            ? "Iniciá sesión para subir archivos."
+            : "Supabase todavía no está configurado.";
     }
 }
 
@@ -283,16 +316,7 @@ function renderCourses() {
         info.innerHTML = `<span class="eyebrow">Curso</span><h3>${course.nombre}</h3>`;
         card.appendChild(info);
 
-        card.addEventListener("click", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            openCourseFullscreen(course.id);
-        });
-        card.addEventListener("touchend", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            openCourseFullscreen(course.id);
-        });
+        card.addEventListener("click", () => openCourseFullscreen(course.id));
         card.addEventListener("keydown", (e) => {
             if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
@@ -429,82 +453,100 @@ function renderHorarioMobile(rows) {
     dayTabs.innerHTML = "";
     dayTrack.innerHTML = "";
 
-    days.forEach((day, idx) => {
+    days.forEach((day, dayIdx) => {
         const tab = document.createElement("button");
         tab.classList.add("day-tab");
-        if (idx === 0) tab.classList.add("active");
+        if (dayIdx === 0) tab.classList.add("active");
         tab.textContent = day.slice(0, 3);
-        tab.addEventListener("click", () => {
-            dayTrack.children[idx].scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
-        });
+        tab.addEventListener("click", () => showDay(dayIdx));
         dayTabs.appendChild(tab);
 
         const panel = document.createElement("div");
         panel.classList.add("day-panel");
+        if (dayIdx === 0) panel.classList.add("active");
 
-        rows.forEach(row => {
-            const item = document.createElement("div");
-            item.classList.add("timeline-item");
+        // Recorremos las filas fusionando las que tengan la misma materia
+        // seguida (igual que en la tabla de escritorio).
+        let i = 0;
+        while (i < rows.length) {
+            const row = rows[i];
 
-            const timeCol = document.createElement("div");
-            timeCol.classList.add("timeline-time-col");
-            timeCol.textContent = row.hora.split(" - ")[0];
-            item.appendChild(timeCol);
-
-            const connector = document.createElement("div");
-            connector.classList.add("timeline-connector");
-            connector.innerHTML = `<span class="timeline-dot"></span><span class="timeline-line"></span>`;
-            item.appendChild(connector);
-
-            const card = document.createElement("div");
             if (row.tipo === "recreo") {
-                card.classList.add("timeline-card", "recreo-card");
-                card.textContent = row.label || "Recreo";
-            } else {
-                const cell = row[day];
-                if (cell) {
-                    card.classList.add("timeline-card", "clickable");
-                    const prof = findProfesor(cell.profesor);
-                    card.innerHTML = `
-                        <div class="materia-name">${materiaNombre(cell.materia)}</div>
-                        ${prof ? `<div class="prof-name">${prof.nombre}</div>` : ""}
-                    `;
-                    card.addEventListener("click", (e) => {
-                        e.stopPropagation();
-                        openMateriaModal(cell.materia, cell.profesor);
-                    });
-                    card.addEventListener("touchend", (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        openMateriaModal(cell.materia, cell.profesor);
-                    });
-                } else {
-                    card.classList.add("timeline-card", "libre-card");
-                    card.textContent = "Libre";
-                }
+                panel.appendChild(buildTimelineItem(row.hora, buildRecreoCard(row)));
+                i++;
+                continue;
             }
-            item.appendChild(card);
-            panel.appendChild(item);
-        });
+
+            const cell = row[day];
+
+            if (!cell) {
+                panel.appendChild(buildTimelineItem(row.hora.split(" - ")[0], buildLibreCard()));
+                i++;
+                continue;
+            }
+
+            // Agrupamos mientras la fila siguiente tenga la misma materia+profesor ese día
+            let j = i + 1;
+            while (j < rows.length && rows[j].tipo === "clase" && cellKey(rows[j][day]) === cellKey(cell)) {
+                j++;
+            }
+
+            const horaInicio = row.hora.split(" - ")[0];
+            panel.appendChild(buildTimelineItem(horaInicio, buildMateriaCard(cell)));
+            i = j;
+        }
+
         dayTrack.appendChild(panel);
     });
-
-    setupDayObserver();
 }
 
-function setupDayObserver() {
-    if (dayObserver) dayObserver.disconnect();
-    dayObserver = new IntersectionObserver(
-        entries => {
-            entries.forEach(entry => {
-                if (!entry.isIntersecting) return;
-                const idx = Array.from(dayTrack.children).indexOf(entry.target);
-                document.querySelectorAll(".day-tab").forEach((t, i) => t.classList.toggle("active", i === idx));
-            });
-        },
-        { root: dayTrack, threshold: 0.6 }
-    );
-    Array.from(dayTrack.children).forEach(panel => dayObserver.observe(panel));
+function buildTimelineItem(horaLabel, cardEl) {
+    const item = document.createElement("div");
+    item.classList.add("timeline-item");
+
+    const timeCol = document.createElement("div");
+    timeCol.classList.add("timeline-time-col");
+    timeCol.textContent = horaLabel;
+    item.appendChild(timeCol);
+
+    const connector = document.createElement("div");
+    connector.classList.add("timeline-connector");
+    connector.innerHTML = `<span class="timeline-dot"></span><span class="timeline-line"></span>`;
+    item.appendChild(connector);
+
+    item.appendChild(cardEl);
+    return item;
+}
+
+function buildRecreoCard(row) {
+    const card = document.createElement("div");
+    card.classList.add("timeline-card", "recreo-card");
+    card.textContent = row.label || "Recreo";
+    return card;
+}
+
+function buildLibreCard() {
+    const card = document.createElement("div");
+    card.classList.add("timeline-card", "libre-card");
+    card.textContent = "Libre";
+    return card;
+}
+
+function buildMateriaCard(cell) {
+    const card = document.createElement("div");
+    card.classList.add("timeline-card", "clickable");
+    const prof = findProfesor(cell.profesor);
+    card.innerHTML = `
+        <div class="materia-name">${materiaNombre(cell.materia)}</div>
+        ${prof ? `<div class="prof-name">${prof.nombre}</div>` : ""}
+    `;
+    card.addEventListener("click", () => openMateriaModal(cell.materia, cell.profesor));
+    return card;
+}
+
+function showDay(idx) {
+    document.querySelectorAll(".day-tab").forEach((t, i) => t.classList.toggle("active", i === idx));
+    document.querySelectorAll(".day-panel").forEach((p, i) => p.classList.toggle("active", i === idx));
 }
 
 /* ===== MODAL MATERIA ===== */
@@ -695,11 +737,6 @@ function renderStudentsTrack(courseId) {
         apellidoEl.textContent = primerApellido(s.nombre);
         card.appendChild(apellidoEl);
         card.addEventListener("click", () => openStudentModal(s));
-        card.addEventListener("touchend", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            openStudentModal(s);
-        });
         studentsTrack.appendChild(card);
     });
 }
@@ -725,10 +762,13 @@ function openStudentModal(s) {
     studentModalIngles.textContent = s.nivelIngles || "-";
     studentModalContrib.textContent = "...";
 
-    if (firebaseListo()) {
-        db.collection("archivos").where("subidoPorId", "==", s.id).get()
-            .then(snap => {
-                studentModalContrib.textContent = snap.size + (snap.size === 1 ? " archivo" : " archivos");
+    if (supabaseListo()) {
+        supabase
+            .from("archivos")
+            .select("*", { count: "exact", head: true })
+            .eq("subido_por_id", s.id)
+            .then(({ count }) => {
+                studentModalContrib.textContent = (count || 0) + ((count || 0) === 1 ? " archivo" : " archivos");
             })
             .catch(() => { studentModalContrib.textContent = "-"; });
     } else {

@@ -11,37 +11,9 @@
 
     <link rel="stylesheet" href="style.css">
 
-    <!-- Firebase v8 CDN -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
-    <!-- Configuracion de Firebase inline (asegura que firebase este cargado) -->
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyANuIq0Te9cuLg5w5AFqa2wpXxVLR0sVZI",
-            authDomain: "oasis-548cf.firebaseapp.com",
-            projectId: "oasis-548cf",
-            storageBucket: "oasis-548cf.appspot.com",
-            messagingSenderId: "604369694270",
-            appId: "1:604369694270:web:a46f693c06ab6879172b6f",
-            measurementId: "G-DRWKJNJ85L"
-        };
-
-        let db = null;
-
-        try {
-            if (typeof firebase !== "undefined") {
-                firebase.initializeApp(firebaseConfig);
-                db = firebase.firestore();
-                console.log("Firebase inicializado correctamente");
-                console.log("db:", db);
-            } else {
-                console.error("Firebase no esta definido. Verifica que los scripts de Firebase se cargaron.");
-            }
-        } catch (err) {
-            console.error("Error al inicializar Firebase:", err);
-        }
-    </script>
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="data/supabase-config.js"></script>
 <base target="_blank">
 </head>
 <body>
@@ -217,7 +189,7 @@
 
         <div class="dropzone" id="dropzone" style="display:none;">
             <input type="file" id="materiaFileInput" multiple hidden>
-            <p>Arrastra un archivo aca, o <span class="dropzone-link">hace click</span> (max. ~700 KB)</p>
+            <p>Arrastra un archivo aca, o <span class="dropzone-link">hace click</span> (max. 50 MB)</p>
         </div>
         <p class="login-hint" id="uploadLoginHint">Inicia sesion para subir archivos.</p>
     </div>
@@ -240,12 +212,16 @@
 </div>
 
 <!-- Datos locales -->
-<script src="data/cursos.js"></script>
-<script src="data/profesores.js"></script>
-<script src="data/materias.js"></script>
-<script src="data/horarios.js"></script>
-<script src="data/galeria.js"></script>
-<script src="data/estudiantes.js"></script>
-<script src="script.js"></script>
+<!-- IMPORTANTE: cada vez que edites uno de estos archivos, subile 1 al
+     numero de ?v= correspondiente (ej. ?v=1 -> ?v=2). Así el navegador
+     sabe que cambio y lo vuelve a descargar en vez de usar el que tenia
+     guardado en cache. -->
+<script src="data/cursos.js?v=1"></script>
+<script src="data/profesores.js?v=1"></script>
+<script src="data/materias.js?v=1"></script>
+<script src="data/horarios.js?v=1"></script>
+<script src="data/galeria.js?v=1"></script>
+<script src="data/estudiantes.js?v=1"></script>
+<script src="script.js?v=1"></script>
 </body>
 </html>
