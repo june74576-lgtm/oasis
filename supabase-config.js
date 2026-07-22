@@ -56,5 +56,5 @@ let supabase = null;
 if (!SUPABASE_URL.includes("TU_PROYECTO") && window.supabase) {
     supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 } else {
-    console.warn("Supabase no está configurado todavía — completá data/supabase-config.js");
+    console.warn("Supabase no está configurado todavía — completá supabase-config.js");
 }
