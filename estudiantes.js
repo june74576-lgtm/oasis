@@ -19,7 +19,7 @@ const estudiantesDB = [
     },
     {
         id: 3,
-        nombre: "Adrián Dominguez",
+        nombre: "Adrián Patrick Dominguez Lopez",
         foto: "fotos_estudiantes/dominguezadrian.jpg",
         curso: "2ITA",
         fechaNacimiento: "",
@@ -96,7 +96,7 @@ const estudiantesDB = [
         curso: "2ITA",
         fechaNacimiento: "2010-06-10",
         nivelIngles: "Advanced (B2)",
-        cargo: ""
+        cargo: "Secretario"
     },
     {
         id: 12,
@@ -132,7 +132,7 @@ const estudiantesDB = [
         curso: "2ITA",
         fechaNacimiento: "2010-04-08",
         nivelIngles: "Basic (B1+)",
-        cargo: ""
+        cargo: "Tesorero"
     },
     {
         id: 16,
