@@ -51,10 +51,16 @@
 const SUPABASE_URL = "https://mupdiqlibvhvckcoqprp.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGRpcWxpYnZodmNrY29xcHJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3NDQ4NDksImV4cCI6MjEwMDMyMDg0OX0.KI1OdPh9dXKk2DGyNwb8Cfmu1usClbzbx8Zoy1X4V8A";
 
-let supabase = null;
+// NOTA IMPORTANTE: El CDN de Supabase ya expone una variable global 'supabase'.
+// Usamos un nombre diferente (supabaseClient) para evitar el conflicto.
+// Luego asignamos a window.supabase para que script.js lo use.
 
-if (!SUPABASE_URL.includes("TU_PROYECTO") && window.supabase) {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let supabaseClient = null;
+
+if (!SUPABASE_URL.includes("TU_PROYECTO") && window.supabase && window.supabase.createClient) {
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // Exponemos como variable global para que script.js funcione sin cambios
+    window.supabase = supabaseClient;
 } else {
-    console.warn("Supabase no está configurado todavía — completá supabase-config.js");
+    console.warn("[Oasis] Supabase no está configurado todavía — completá supabase-config.js");
 }
