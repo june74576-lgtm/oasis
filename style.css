@@ -90,7 +90,6 @@ header{
     display:flex; flex-wrap:nowrap; justify-content:flex-start; gap:24px;
     padding:15px 6px; overflow-x:auto; scroll-behavior:smooth; width:100%;
     -webkit-overflow-scrolling:touch; scrollbar-width:none;
-    touch-action:pan-x;
 }
 
 .cards::-webkit-scrollbar,
