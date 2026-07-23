@@ -13,8 +13,7 @@
 
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase-config.js"></script>
-<base target="_blank">
+    <script src="data/supabase-config.js"></script>
 <base target="_blank">
 </head>
 <body>
@@ -24,7 +23,7 @@
         <span class="brand">OASIS</span>
 
         <div class="auth" id="authArea">
-            <button class="btn-filled small" id="loginBtn">Iniciar sesión</button>
+            <button class="btn-filled small" id="loginBtn">Iniciar sesion</button>
 
             <div class="user-chip" id="userChip" style="display:none;">
                 <span id="userChipName"></span>
@@ -58,7 +57,7 @@
             </svg>
         </div>
         <h1>OASIS</h1>
-        <p class="tagline">Segundo Informática - Portal de clase</p>
+        <p class="tagline">Segundo Informatica - Portal de clase</p>
     </div>
 </section>
 
@@ -78,7 +77,7 @@
 <section class="about" id="about">
     <h2>Todo en un solo lugar</h2>
     <div class="divider-pill"></div>
-    <p>Si hay algún error en alguna fecha, nombre o cualquier otro dato, escribime al WhatsApp para corregirlo.</p>
+    <p>Si hay algun error en alguna fecha, nombre o cualquier otro dato, escribeme al whatsapp para corregirlo.</p>
 </section>
 
 <footer>
@@ -109,7 +108,7 @@
             <div class="horario-wrapper">
                 <table class="horario" id="horarioTable">
                     <thead>
-                        <tr><th>Hora</th><th>Lunes</th><th>Martes</th><th>Miércoles</th><th>Jueves</th><th>Viernes</th></tr>
+                        <tr><th>Hora</th><th>Lunes</th><th>Martes</th><th>Miercoles</th><th>Jueves</th><th>Viernes</th></tr>
                     </thead>
                     <tbody id="horarioBody"></tbody>
                 </table>
@@ -137,10 +136,10 @@
             </div>
         </section>
 
-        <!-- Galería -->
+        <!-- Galeria -->
         <section class="fs-section">
             <div class="fs-section-header">
-                <h2>Galería</h2>
+                <h2>Galeria</h2>
                 <div class="divider-pill"></div>
             </div>
             <div class="galeria-viewport">
@@ -163,7 +162,7 @@
         <h3 id="studentModalName"></h3>
         <div class="mini-details">
             <p><span>Nacimiento</span><strong id="studentModalBirth">-</strong></p>
-            <p><span>Nivel de inglés</span><strong id="studentModalIngles">-</strong></p>
+            <p><span>Nivel de ingles</span><strong id="studentModalIngles">-</strong></p>
             <p><span>Contribuciones</span><strong id="studentModalContrib">-</strong></p>
         </div>
     </div>
@@ -190,9 +189,9 @@
 
         <div class="dropzone" id="dropzone" style="display:none;">
             <input type="file" id="materiaFileInput" multiple hidden>
-            <p>Arrastrá un archivo acá, o <span class="dropzone-link">hacé click</span> (máx. 50 MB)</p>
+            <p>Arrastra un archivo aca, o <span class="dropzone-link">hace click</span> (max. 50 MB)</p>
         </div>
-        <p class="login-hint" id="uploadLoginHint">Iniciá sesión para subir archivos.</p>
+        <p class="login-hint" id="uploadLoginHint">Inicia sesion para subir archivos.</p>
     </div>
 </div>
 
@@ -202,11 +201,11 @@
         <button class="modal-close" id="loginModalClose" aria-label="Cerrar">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
         </button>
-        <h3>Iniciar sesión</h3>
+        <h3>Iniciar sesion</h3>
         <div class="login-form">
             <input type="text" id="loginUsername" placeholder="Usuario" autocomplete="username">
-            <input type="password" id="loginPassword" placeholder="Contraseña" autocomplete="current-password">
-            <p class="login-error" id="loginError" style="display:none;">Usuario o contraseña incorrectos</p>
+            <input type="password" id="loginPassword" placeholder="Contrasena" autocomplete="current-password">
+            <p class="login-error" id="loginError" style="display:none;">Usuario o contrasena incorrectos</p>
             <button id="loginSubmitBtn" class="btn-filled">Entrar</button>
         </div>
     </div>
@@ -214,15 +213,15 @@
 
 <!-- Datos locales -->
 <!-- IMPORTANTE: cada vez que edites uno de estos archivos, subile 1 al
-     número de ?v= correspondiente (ej. ?v=1 -> ?v=2). Así el navegador
-     sabe que cambió y lo vuelve a descargar en vez de usar el que tenía
-     guardado en caché. -->
-<script src="data/cursos.js?v=2"></script>
-<script src="data/profesores.js?v=2"></script>
-<script src="data/materias.js?v=2"></script>
-<script src="data/horarios.js?v=2"></script>
-<script src="data/galeria.js?v=2"></script>
-<script src="data/estudiantes.js?v=2"></script>
-<script src="script.js?v=2"></script>
+     numero de ?v= correspondiente (ej. ?v=1 -> ?v=2). Así el navegador
+     sabe que cambio y lo vuelve a descargar en vez de usar el que tenia
+     guardado en cache. -->
+<script src="data/cursos.js?v=1"></script>
+<script src="data/profesores.js?v=1"></script>
+<script src="data/materias.js?v=1"></script>
+<script src="data/horarios.js?v=1"></script>
+<script src="data/galeria.js?v=1"></script>
+<script src="data/estudiantes.js?v=1"></script>
+<script src="script.js?v=1"></script>
 </body>
 </html>

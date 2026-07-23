@@ -1,4 +1,4 @@
-const days = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
+const days = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes"];
 
 const FILE_ICON_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
     <path d="M7 3.5h7l4 4V19a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 19V5a1.5 1.5 0 0 1 1.5-1.5Z"/>
@@ -157,7 +157,7 @@ function formatFecha(fecha) {
 /* ===== SUPABASE ===== */
 
 function supabaseListo() {
-    return typeof supabase !== "undefined" && supabase !== null;
+    return typeof supabase !== "undefined" && supabase !== null && typeof supabase.from === "function";
 }
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB (límite del plan gratis de Supabase)
@@ -165,8 +165,7 @@ const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB (límite del plan gratis de Sup
 async function loadMateriaArchivos(materiaId) {
     materiaArchivosList.innerHTML = `<p class="materia-archivos-empty">Cargando...</p>`;
     if (!supabaseListo()) {
-        materiaArchivosList.innerHTML = `<p class="materia-archivos-empty">Supabase no configurado. Verificá que supabase-config.js esté cargado correctamente.</p>`;
-        console.warn("[Oasis] Supabase no está inicializado. Verificá la URL y la anon key en supabase-config.js");
+        materiaArchivosList.innerHTML = `<p class="materia-archivos-empty">Supabase no configurado.</p>`;
         return;
     }
     try {
@@ -176,21 +175,18 @@ async function loadMateriaArchivos(materiaId) {
             .eq("materia", materiaId)
             .order("fecha", { ascending: false });
 
-        if (error) {
-            console.error("[Oasis] Error de Supabase al cargar archivos:", error);
-            throw error;
-        }
+        if (error) throw error;
         renderMateriaArchivos(data || []);
     } catch (err) {
-        console.error("[Oasis] Error cargando archivos:", err);
-        materiaArchivosList.innerHTML = `<p class="materia-archivos-empty">Error al cargar archivos. Revisá la consola (F12) para más detalles.</p>`;
+        console.error("Error cargando archivos:", err);
+        materiaArchivosList.innerHTML = `<p class="materia-archivos-empty">Error al cargar archivos.</p>`;
     }
 }
 
 function renderMateriaArchivos(files) {
     materiaArchivosList.innerHTML = "";
     if (files.length === 0) {
-        materiaArchivosList.innerHTML = `<p class="materia-archivos-empty">Aún no hay archivos</p>`;
+        materiaArchivosList.innerHTML = `<p class="materia-archivos-empty">Aun no hay archivos</p>`;
         return;
     }
     files.forEach(file => {
@@ -301,7 +297,7 @@ function renderCourses() {
     const courses = typeof cursosDB !== "undefined" ? cursosDB : [];
     coursesTrack.innerHTML = "";
     if (courses.length === 0) {
-        coursesTrack.innerHTML = `<p class="courses-empty">No hay cursos todavía</p>`;
+        coursesTrack.innerHTML = `<p class="courses-empty">No hay cursos todavia</p>`;
         return;
     }
     courses.forEach(course => {
@@ -621,7 +617,7 @@ dropzone.addEventListener("drop", e => {
     if (e.dataTransfer.files.length) subirArchivos(e.dataTransfer.files);
 });
 
-/* ===== GALERÍA ===== */
+/* ===== GALERIA ===== */
 
 function renderGaleria(courseId) {
     const dbAll = typeof galeriaDB !== "undefined" ? galeriaDB : {};
@@ -630,7 +626,7 @@ function renderGaleria(courseId) {
     galeriaTrack.style.animation = "none";
 
     if (list.length === 0) {
-        galeriaTrack.innerHTML = `<p class="galeria-empty">Sin fotos en la galería todavía</p>`;
+        galeriaTrack.innerHTML = `<p class="galeria-empty">Sin fotos en la galeria todavia</p>`;
         return;
     }
 
@@ -718,15 +714,9 @@ updateAuthUI();
 
 function renderStudentsTrack(courseId) {
     const list = (typeof estudiantesDB !== "undefined" ? estudiantesDB : []).filter(e => e.curso === courseId);
-
-    // Debug: avisar en consola si no hay datos
-    if (typeof estudiantesDB === "undefined") {
-        console.warn("[Oasis] estudiantesDB no está definido. Verificá que estudiantes.js se cargue correctamente (sin errores 404).");
-    }
-
     studentsTrack.innerHTML = "";
     if (list.length === 0) {
-        studentsTrack.innerHTML = `<p class="students-empty">Sin estudiantes todavía</p>`;
+        studentsTrack.innerHTML = `<p class="students-empty">Sin estudiantes todavia</p>`;
         return;
     }
     list.forEach(s => {
@@ -751,21 +741,8 @@ function renderStudentsTrack(courseId) {
     });
 }
 
-studentsPrevBtn.addEventListener("click", () => {
-    if (studentsTrack.children.length === 0) {
-        console.warn("[Oasis] No hay tarjetas de estudiantes para scrollear.");
-        return;
-    }
-    studentsTrack.scrollBy({ left: -320, behavior: "smooth" });
-});
-
-studentsNextBtn.addEventListener("click", () => {
-    if (studentsTrack.children.length === 0) {
-        console.warn("[Oasis] No hay tarjetas de estudiantes para scrollear.");
-        return;
-    }
-    studentsTrack.scrollBy({ left: 320, behavior: "smooth" });
-});
+studentsPrevBtn.addEventListener("click", () => studentsTrack.scrollBy({ left: -320, behavior: "smooth" }));
+studentsNextBtn.addEventListener("click", () => studentsTrack.scrollBy({ left: 320, behavior: "smooth" }));
 
 function openStudentModal(s) {
     if (s.foto) {
@@ -785,6 +762,10 @@ function openStudentModal(s) {
     studentModalIngles.textContent = s.nivelIngles || "-";
     studentModalContrib.textContent = "...";
 
+    // El modal se muestra siempre, pase lo que pase con Supabase después.
+    studentModalOverlay.classList.add("active");
+    lockScroll();
+
     if (supabaseListo()) {
         supabase
             .from("archivos")
@@ -797,9 +778,6 @@ function openStudentModal(s) {
     } else {
         studentModalContrib.textContent = "-";
     }
-
-    studentModalOverlay.classList.add("active");
-    lockScroll();
 }
 
 function closeStudentModal() {
