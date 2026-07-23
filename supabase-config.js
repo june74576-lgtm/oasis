@@ -40,27 +40,24 @@
 // 6. En la misma pantalla (o en "API Keys") copiá la "anon public" key
 //    y pegala en SUPABASE_ANON_KEY
 //
-// Nota sobre seguridad: igual que con el login, estas reglas son abiertas
-// (cualquiera puede leer/subir/borrar) porque no hay backend real atrás
-// verificando quién sos. El botón de borrar solo se MUESTRA si sos el
-// que subió el archivo, pero alguien con conocimientos técnicos podría
-// saltarse eso. Para este proyecto (un curso de compañeros) es un riesgo
-// aceptable — si algún día hay problemas de gente borrando archivos ajenos,
-// avisame y cerramos la política de "delete" para que nadie pueda.
+// Nota sobre seguridad: estas reglas son abiertas (cualquiera puede
+// leer/subir/borrar) porque no hay backend real verificando quién sos.
+// El botón de borrar solo se MUESTRA si sos el que subió el archivo,
+// pero alguien con conocimientos técnicos podría saltarse eso. Para
+// este proyecto (compañeros de curso) es un riesgo aceptable.
 
 const SUPABASE_URL = "https://mupdiqlibvhvckcoqprp.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGRpcWxpYnZodmNrY29xcHJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3NDQ4NDksImV4cCI6MjEwMDMyMDg0OX0.KI1OdPh9dXKk2DGyNwb8Cfmu1usClbzbx8Zoy1X4V8A";
 
-// NOTA IMPORTANTE: El CDN de Supabase ya expone una variable global 'supabase'.
-// Usamos un nombre diferente (supabaseClient) para evitar el conflicto.
-// Luego asignamos a window.supabase para que script.js lo use.
+// OJO: la librería del CDN se llama a sí misma "supabase" en window.
+// Por eso a NUESTRO cliente (ya conectado a tu proyecto) lo llamamos
+// distinto: supabaseClient. Todo script.js usa ese nombre, no "supabase"
+// a secas, para no pisarse con la librería.
 
 let supabaseClient = null;
 
-if (!SUPABASE_URL.includes("TU_PROYECTO") && window.supabase && window.supabase.createClient) {
+if (!SUPABASE_URL.includes("TU_PROYECTO") && window.supabase && typeof window.supabase.createClient === "function") {
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    // Exponemos como variable global para que script.js funcione sin cambios
-    window.supabase = supabaseClient;
 } else {
-    console.warn("[Oasis] Supabase no está configurado todavía — completá supabase-config.js");
+    console.warn("[Oasis] Supabase no está configurado todavía — revisá data/supabase-config.js");
 }

@@ -157,7 +157,7 @@ function formatFecha(fecha) {
 /* ===== SUPABASE ===== */
 
 function supabaseListo() {
-    return typeof supabase !== "undefined" && supabase !== null && typeof supabase.from === "function";
+    return typeof supabaseClient !== "undefined" && supabaseClient !== null && typeof supabaseClient.from === "function";
 }
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB (límite del plan gratis de Supabase)
@@ -169,7 +169,7 @@ async function loadMateriaArchivos(materiaId) {
         return;
     }
     try {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from("archivos")
             .select("*")
             .eq("materia", materiaId)
@@ -190,7 +190,7 @@ function renderMateriaArchivos(files) {
         return;
     }
     files.forEach(file => {
-        const { data: urlData } = supabase.storage.from("archivos").getPublicUrl(file.storage_path);
+        const { data: urlData } = supabaseClient.storage.from("archivos").getPublicUrl(file.storage_path);
         const url = urlData.publicUrl;
 
         const row = document.createElement("div");
@@ -222,8 +222,8 @@ async function borrarArchivo(file) {
     if (!confirm(`¿Borrar "${file.nombre}"?`)) return;
 
     try {
-        await supabase.storage.from("archivos").remove([file.storage_path]);
-        const { error } = await supabase.from("archivos").delete().eq("id", file.id);
+        await supabaseClient.storage.from("archivos").remove([file.storage_path]);
+        const { error } = await supabaseClient.from("archivos").delete().eq("id", file.id);
         if (error) throw error;
         await loadMateriaArchivos(currentMateriaId);
     } catch (err) {
@@ -253,10 +253,10 @@ async function subirArchivos(files) {
         for (const file of Array.from(files)) {
             const path = `${currentMateriaId}/${Date.now()}_${rutaSegura(file.name)}`;
 
-            const { error: uploadError } = await supabase.storage.from("archivos").upload(path, file);
+            const { error: uploadError } = await supabaseClient.storage.from("archivos").upload(path, file);
             if (uploadError) throw uploadError;
 
-            const { error: insertError } = await supabase.from("archivos").insert({
+            const { error: insertError } = await supabaseClient.from("archivos").insert({
                 materia: currentMateriaId,
                 curso: currentCourse,
                 nombre: file.name,
@@ -767,7 +767,7 @@ function openStudentModal(s) {
     lockScroll();
 
     if (supabaseListo()) {
-        supabase
+        supabaseClient
             .from("archivos")
             .select("*", { count: "exact", head: true })
             .eq("subido_por_id", s.id)
