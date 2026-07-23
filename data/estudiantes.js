@@ -4,7 +4,7 @@ const estudiantesDB = [
         nombre: "Carlos Emilio Álvarez Plaza",
         foto: "fotos_estudiantes/alvarezcarlos.jpg",
         curso: "2ITA",
-        fechaNacimiento: "2010-01-05",
+        fechaNacimiento: "2010-01-03",
         nivelIngles: "Advanced (B2)",
         cargo: ""
     },
@@ -19,11 +19,11 @@ const estudiantesDB = [
     },
     {
         id: 3,
-        nombre: "Adrián Dominguez",
+        nombre: "Adrián Patrick Dominguez Lopez",
         foto: "fotos_estudiantes/dominguezadrian.jpg",
         curso: "2ITA",
         fechaNacimiento: "",
-        nivelIngles: "Intermedium/Basic (B1+)",
+        nivelIngles: "Basic (B1+)",
         cargo: ""
     },
     {
@@ -32,7 +32,7 @@ const estudiantesDB = [
         foto: "fotos_estudiantes/galarzaemerson.jpg",
         curso: "2ITA",
         fechaNacimiento: "",
-        nivelIngles: "Intermedium/Basic (B1+)",
+        nivelIngles: "Basic (B1+)",
         cargo: "Vicepresidente"
     },
     {
@@ -41,7 +41,7 @@ const estudiantesDB = [
         foto: "fotos_estudiantes/grandaadrian.jpg",
         curso: "2ITA",
         fechaNacimiento: "2010-01-30",
-        nivelIngles: "Intermedium/Basic (B1+)",
+        nivelIngles: "Basic (B1+)",
         cargo: ""
     },
     {
@@ -58,7 +58,7 @@ const estudiantesDB = [
         nombre: "Jeremy Josue Moya León",
         foto: "fotos_estudiantes/moyajeremy.jpg",
         curso: "2ITA",
-        fechaNacimiento: "2007-01-10",
+        fechaNacimiento: "2010-10-07",
         nivelIngles: "Advanced (B2)",
         cargo: ""
     },
@@ -96,7 +96,7 @@ const estudiantesDB = [
         curso: "2ITA",
         fechaNacimiento: "2010-06-10",
         nivelIngles: "Advanced (B2)",
-        cargo: ""
+        cargo: "Secretario"
     },
     {
         id: 12,
@@ -104,7 +104,7 @@ const estudiantesDB = [
         foto: "fotos_estudiantes/saavedradanny.jpg",
         curso: "2ITA",
         fechaNacimiento: "2010-07-21",
-        nivelIngles: "Intermedium/Basic (B1+)",
+        nivelIngles: "Basic (B1+)",
         cargo: "Presidente"
     },
     {
@@ -113,7 +113,7 @@ const estudiantesDB = [
         foto: "fotos_estudiantes/suarezricardo.jpg",
         curso: "2ITA",
         fechaNacimiento: "",
-        nivelIngles: "Intermedium/Basic (B1+)",
+        nivelIngles: "Basic (B1+)",
         cargo: ""
     },
     {
@@ -122,7 +122,7 @@ const estudiantesDB = [
         foto: "fotos_estudiantes/tipanalessandro.jpg",
         curso: "2ITA",
         fechaNacimiento: "",
-        nivelIngles: "Intermedium/Basic (B1+)",
+        nivelIngles: "Basic (B1+)",
         cargo: ""
     },
     {
@@ -131,8 +131,8 @@ const estudiantesDB = [
         foto: "fotos_estudiantes/torresricardo.jpg",
         curso: "2ITA",
         fechaNacimiento: "2010-04-08",
-        nivelIngles: "Intermedium/Basic (B1+)",
-        cargo: ""
+        nivelIngles: "Basic (B1+)",
+        cargo: "Tesorero"
     },
     {
         id: 16,

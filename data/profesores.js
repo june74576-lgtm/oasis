@@ -6,7 +6,7 @@ const profesoresDB = [
     },
     {
         id: "katherine",
-        nombre: "Katherine Aigail Del Pezo Solis",
+        nombre: "Katherine Abigail Del Pezo Solis",
         foto: "fotos_profesores/delpezokatherine.jpg"
     },
     {
