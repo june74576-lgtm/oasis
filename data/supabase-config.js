@@ -34,6 +34,22 @@
 // 4. Andá a "Storage" (ícono de la izquierda) → "New bucket" → nombre
 //    "archivos" → activá "Public bucket" → Create bucket
 //
+//    OJO: "Public bucket" solo habilita LEER archivos. Para poder SUBIR,
+//    hace falta agregar políticas aparte. Andá a "SQL Editor" → "New query"
+//    → pegá esto y Run:
+//
+//    create policy "acceso publico archivos - leer"
+//    on storage.objects for select
+//    using ( bucket_id = 'archivos' );
+//
+//    create policy "acceso publico archivos - subir"
+//    on storage.objects for insert
+//    with check ( bucket_id = 'archivos' );
+//
+//    create policy "acceso publico archivos - borrar"
+//    on storage.objects for delete
+//    using ( bucket_id = 'archivos' );
+//
 // 5. Andá a "Project Settings" (ícono de tuerca abajo) → "Data API" →
 //    copiá la "Project URL" y pegala en SUPABASE_URL más abajo
 //

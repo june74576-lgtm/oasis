@@ -86,5 +86,77 @@ const materiasDB = [
     {
         id: "efisica2ITA",
         nombre: "Educación Física"
+    },
+    {
+    id: "fisica2CNB",
+    nombre: "Física"
+    },
+    {
+        id: "quimica2CNB",
+        nombre: "Química"
+    },
+    {
+        id: "lengua2CNB",
+        nombre: "Lengua y Literatura"
+    },
+    {
+        id: "tutoria2CNB",
+        nombre: "Tutoría - Misa"
+    },
+    {
+        id: "matematicas2CNB",
+        nombre: "Matemática"
+    },
+    {
+        id: "biologia2CNB",
+        nombre: "Biología"
+    },
+    {
+        id: "animacion2CNB",
+        nombre: "Animación a la Lectura"
+    },
+    {
+        id: "religion2CNB",
+        nombre: "Religión"
+    },
+    {
+        id: "ingles2CNB",
+        nombre: "Inglés"
+    },
+    {
+        id: "efisica2CNB",
+        nombre: "Educación Física"
+    },
+    {
+        id: "eca2CNB",
+        nombre: "Educación Cultural y Artística"
+    },
+    {
+        id: "historia2CNB",
+        nombre: "Historia"
+    },
+    {
+        id: "classroom2CNB",
+        nombre: "Classroom Community for Speaking"
+    },
+    {
+        id: "ciudadania2CNB",
+        nombre: "Educación para la Ciudadanía"
+    },
+    {
+        id: "emprendimiento2CNB",
+        nombre: "Emprendimiento y Gestión"
+    },
+    {
+        id: "filosofia2CNB",
+        nombre: "Filosofía"
+    },
+    {
+        id: "robotica2CNB",
+        nombre: "Robótica"
+    },
+    {
+        id: "civica2CNB",
+        nombre: "Cívica y Acompañamiento en el Aula"
     }
 ];

@@ -12,7 +12,8 @@ const profesoresDB = [
     {
         id: "muniz",
         nombre: "Luis Alfredo Muñiz Palacios",
-        foto: "fotos_profesores/munizluis.jpg"
+        foto: "fotos_profesores/munizluis.jpg",
+        tutor: "2ITA"
     },
     {
         id: "elsa",
@@ -42,7 +43,8 @@ const profesoresDB = [
     {
         id: "ayala",
         nombre: "Maria Alexandra Ayala Cadena",
-        foto: "fotos_profesores/ayalamaria.jpg"
+        foto: "fotos_profesores/ayalamaria.jpg",
+        tutor: "2CNB"
     },
     {
         id: "hugo",
@@ -94,4 +96,14 @@ const profesoresDB = [
         nombre: "Manuel Yonny Corozo Vernaza",
         foto: "fotos_profesores/corozomanuel.jpg"
     },
+    {
+    id: "oscar",
+    nombre: "Oscar Ricardo Suarez Mendez",
+    foto: "fotos_profesores/suarezoscar.jpg"
+    },
+    {
+        id: "herbozo",
+        nombre: "Jorge Michael Herbozo Gamboa",
+        foto: "fotos_profesores/herbozomichael.jpg"
+    }
 ];
