@@ -50,7 +50,6 @@ function buildPhotoSlot(url, altText) {
 
 const courseFullscreen = document.getElementById("courseFullscreen");
 const fsClose = document.getElementById("fsClose");
-const fsCourseName = document.getElementById("fsCourseName");
 const fsTopbar = document.getElementById("fsTopbar");
 const fsTopbarTitle = document.getElementById("fsTopbarTitle");
 const horarioBody = document.getElementById("horarioBody");
@@ -337,10 +336,6 @@ renderCourses();
 
 fsClose.addEventListener("click", closeCourseFullscreen);
 
-courseFullscreen.addEventListener("scroll", () => {
-    fsTopbar.classList.toggle("scrolled", courseFullscreen.scrollTop > 60);
-});
-
 document.addEventListener("keydown", e => {
     if (e.key !== "Escape") return;
     if (materiaModalOverlay.classList.contains("active")) closeMateriaModal();
@@ -353,15 +348,35 @@ function openCourseFullscreen(courseId) {
     const course = getCourseById(courseId);
     if (!course) return;
     currentCourse = courseId;
-    fsCourseName.textContent = course.nombre;
     fsTopbarTitle.textContent = course.nombre;
-    fsTopbar.classList.remove("scrolled");
+    renderTutor(courseId);
     renderHorario(courseId);
     renderStudentsTrack(courseId);
     renderGaleria(courseId);
     courseFullscreen.classList.add("active");
     courseFullscreen.scrollTop = 0;
     lockScroll();
+}
+
+function renderTutor(courseId) {
+    const tutorCard = document.getElementById("tutorCard");
+    const profs = typeof profesoresDB !== "undefined" ? profesoresDB : [];
+    const tutor = profs.find(p => p.tutor === courseId);
+
+    tutorCard.innerHTML = "";
+    if (!tutor) {
+        tutorCard.innerHTML = `<p class="materia-archivos-empty">Sin tutor asignado</p>`;
+        return;
+    }
+
+    const photoWrap = document.createElement("div");
+    photoWrap.classList.add("tutor-photo-wrap");
+    photoWrap.appendChild(buildPhotoSlot(tutor.foto, tutor.nombre));
+    tutorCard.appendChild(photoWrap);
+
+    const name = document.createElement("span");
+    name.textContent = tutor.nombre;
+    tutorCard.appendChild(name);
 }
 
 function closeCourseFullscreen() {
@@ -465,44 +480,47 @@ function renderHorarioMobile(rows) {
         panel.classList.add("day-panel");
         if (dayIdx === 0) panel.classList.add("active");
 
-        // Recorremos las filas fusionando las que tengan la misma materia
-        // seguida (igual que en la tabla de escritorio).
-        let i = 0;
-        while (i < rows.length) {
-            const row = rows[i];
+        // A diferencia de la tabla de escritorio, acá NO fusionamos las
+        // materias seguidas en una sola tarjeta — quedan separadas, pero
+        // marcamos el conector entre ellas para que se note que son la
+        // misma clase continuando.
+        let prevKey = null;
+        let prevLineEl = null;
+
+        rows.forEach(row => {
+            let built;
 
             if (row.tipo === "recreo") {
-                panel.appendChild(buildTimelineItem(row.hora, buildRecreoCard(row)));
-                i++;
-                continue;
+                built = buildTimelineItem(row.hora, buildRecreoCard(row), false);
+                prevKey = null;
+                prevLineEl = null;
+            } else {
+                const cell = row[day];
+                if (!cell) {
+                    built = buildTimelineItem(row.hora.split(" - ")[0], buildLibreCard(), false);
+                    prevKey = null;
+                    prevLineEl = null;
+                } else {
+                    const key = cellKey(cell);
+                    const isContinuation = key === prevKey;
+                    if (isContinuation && prevLineEl) prevLineEl.classList.add("connected");
+                    built = buildTimelineItem(row.hora.split(" - ")[0], buildMateriaCard(cell), isContinuation);
+                    prevKey = key;
+                    prevLineEl = built.lineEl;
+                }
             }
 
-            const cell = row[day];
-
-            if (!cell) {
-                panel.appendChild(buildTimelineItem(row.hora.split(" - ")[0], buildLibreCard()));
-                i++;
-                continue;
-            }
-
-            // Agrupamos mientras la fila siguiente tenga la misma materia+profesor ese día
-            let j = i + 1;
-            while (j < rows.length && rows[j].tipo === "clase" && cellKey(rows[j][day]) === cellKey(cell)) {
-                j++;
-            }
-
-            const horaInicio = row.hora.split(" - ")[0];
-            panel.appendChild(buildTimelineItem(horaInicio, buildMateriaCard(cell)));
-            i = j;
-        }
+            panel.appendChild(built.item);
+        });
 
         dayTrack.appendChild(panel);
     });
 }
 
-function buildTimelineItem(horaLabel, cardEl) {
+function buildTimelineItem(horaLabel, cardEl, isContinuation) {
     const item = document.createElement("div");
     item.classList.add("timeline-item");
+    if (isContinuation) item.classList.add("continuation");
 
     const timeCol = document.createElement("div");
     timeCol.classList.add("timeline-time-col");
@@ -511,11 +529,17 @@ function buildTimelineItem(horaLabel, cardEl) {
 
     const connector = document.createElement("div");
     connector.classList.add("timeline-connector");
-    connector.innerHTML = `<span class="timeline-dot"></span><span class="timeline-line"></span>`;
+    const dotEl = document.createElement("span");
+    dotEl.classList.add("timeline-dot");
+    if (isContinuation) dotEl.classList.add("hollow");
+    const lineEl = document.createElement("span");
+    lineEl.classList.add("timeline-line");
+    connector.appendChild(dotEl);
+    connector.appendChild(lineEl);
     item.appendChild(connector);
 
     item.appendChild(cardEl);
-    return item;
+    return { item, lineEl };
 }
 
 function buildRecreoCard(row) {
@@ -548,6 +572,7 @@ function showDay(idx) {
     document.querySelectorAll(".day-tab").forEach((t, i) => t.classList.toggle("active", i === idx));
     document.querySelectorAll(".day-panel").forEach((p, i) => p.classList.toggle("active", i === idx));
 }
+
 
 /* ===== MODAL MATERIA ===== */
 

@@ -208,12 +208,6 @@ footer{ text-align:center; padding:34px; background:var(--bg); border-top:1px so
     position:sticky; top:0; z-index:20;
     display:flex; align-items:center; gap:14px;
     padding:16px 20px;
-    background:transparent;
-    backdrop-filter:blur(0px);
-    border-bottom:1px solid transparent;
-    transition:background .3s, backdrop-filter .3s, border-color .3s;
-}
-.fs-topbar.scrolled{
     background:rgba(19,19,22,.72);
     backdrop-filter:blur(20px);
     border-bottom:1px solid var(--outline);
@@ -232,17 +226,20 @@ footer{ text-align:center; padding:34px; background:var(--bg); border-top:1px so
 
 .fs-topbar-title{
     font-size:15px; font-variation-settings:"wght" 700; letter-spacing:.3px;
-    color:var(--on-surface); opacity:0; transition:opacity .3s;
+    color:var(--on-surface);
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
-.fs-topbar.scrolled .fs-topbar-title{ opacity:1; }
-
-.fs-title-area{ padding:14px 26px 6px; }
-.fs-eyebrow{ display:block; color:var(--tertiary); font-size:12px; letter-spacing:2px; text-transform:uppercase; font-variation-settings:"wght" 600; margin-bottom:8px; }
-.fs-title-area h1{ font-size:32px; font-variation-settings:"wght" 700; }
 
 .fs-body{ max-width:920px; margin:0 auto; padding:30px 24px 90px; }
 .fs-section{ margin-bottom:58px; }
+
+.tutor-row{
+    display:flex; align-items:center; gap:14px; justify-content:center;
+    background:var(--surface-1); border-radius:var(--radius-lg); padding:14px 18px;
+}
+.tutor-row span{ font-size:15px; }
+.tutor-photo-wrap{ width:52px; height:52px; border-radius:50%; overflow:hidden; flex-shrink:0; }
+.tutor-photo-wrap .no-photo{ font-size:9px; }
 .fs-section-header{ text-align:center; margin-bottom:22px; }
 .fs-section-header h2{ font-size:24px; font-variation-settings:"wght" 700; }
 
@@ -298,8 +295,12 @@ table.horario td.libre-cell{ color:var(--on-surface-var); font-style:italic; fon
 
 .timeline-connector{ display:flex; flex-direction:column; align-items:center; width:14px; flex-shrink:0; }
 .timeline-dot{ width:9px; height:9px; border-radius:50%; background:var(--primary); margin-top:16px; flex-shrink:0; }
+.timeline-dot.hollow{ background:var(--surface-2); border:2px solid var(--primary); width:7px; height:7px; }
 .timeline-line{ flex:1; width:2px; background:var(--outline); margin-top:4px; min-height:10px; }
+.timeline-line.connected{ background:var(--primary); }
 .timeline-item:last-child .timeline-line{ visibility:hidden; }
+.timeline-item.continuation{ margin-top:-8px; }
+.timeline-item.continuation .timeline-card{ padding-top:9px; padding-bottom:9px; }
 
 .timeline-card{
     flex:1; background:var(--surface-3); border-radius:var(--radius-lg);
@@ -493,13 +494,11 @@ table.horario td.libre-cell{ color:var(--on-surface-var); font-style:italic; fon
     .cards-section{ padding:80px 5% 40px; }
     .about{ padding:90px 8%; }
     .fs-body{ padding:24px 18px 70px; }
-    .fs-title-area{ padding:10px 20px 4px; }
-    .fs-title-area h1{ font-size:26px; }
 }
 
 @media(min-width:901px){
-    .fs-title-area h1{ font-size:46px; }
-    .fs-title-area{ padding:20px 32px 10px; }
+    .fs-topbar{ padding:18px 32px; }
+    .fs-topbar-title{ font-size:17px; }
 }
 
 @media(max-width:700px){
