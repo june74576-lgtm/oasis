@@ -7,6 +7,9 @@ const FILE_ICON_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor
 
 let currentCourse = null;
 let currentMateriaId = null;
+let currentMateriaBaseId = null;
+let currentNivelId = null;
+const materiaNiveles = document.getElementById("materiaNiveles");
 
 /* ===== Bloqueo de scroll ===== */
 
@@ -87,8 +90,12 @@ const uploadLoginHint = document.getElementById("uploadLoginHint");
 
 const loginBtn = document.getElementById("loginBtn");
 const userChip = document.getElementById("userChip");
+const userChipBtn = document.getElementById("userChipBtn");
+const userChipAvatar = document.getElementById("userChipAvatar");
 const userChipName = document.getElementById("userChipName");
-const logoutBtn = document.getElementById("logoutBtn");
+const userMenu = document.getElementById("userMenu");
+const userMenuPerfil = document.getElementById("userMenuPerfil");
+const userMenuLogout = document.getElementById("userMenuLogout");
 
 const loginModalOverlay = document.getElementById("loginModalOverlay");
 const loginModalClose = document.getElementById("loginModalClose");
@@ -164,7 +171,7 @@ const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB (límite del plan gratis de Sup
 async function loadMateriaArchivos(materiaId) {
     materiaArchivosList.innerHTML = `<p class="materia-archivos-empty">Cargando...</p>`;
     if (!supabaseListo()) {
-        materiaArchivosList.innerHTML = `<p class="materia-archivos-empty">Supabase no configurado.</p>`;
+        materiaArchivosList.innerHTML = `<p class="materia-archivos-empty">Supabase no está configurado.</p>`;
         return;
     }
     try {
@@ -185,7 +192,7 @@ async function loadMateriaArchivos(materiaId) {
 function renderMateriaArchivos(files) {
     materiaArchivosList.innerHTML = "";
     if (files.length === 0) {
-        materiaArchivosList.innerHTML = `<p class="materia-archivos-empty">Aun no hay archivos</p>`;
+        materiaArchivosList.innerHTML = `<p class="materia-archivos-empty">Aún no hay archivos</p>`;
         return;
     }
     files.forEach(file => {
@@ -239,8 +246,33 @@ function rutaSegura(nombre) {
         .replace(/[^a-zA-Z0-9._-]/g, "_");
 }
 
+// Deduce el id de nivel ("advanced" / "intermedio") a partir del texto
+// libre que tiene el estudiante en estudiantes.js (ej. "Advanced (B2)").
+function nivelIdDeEstudiante(estudiante) {
+    if (!estudiante || !estudiante.nivelIngles) return null;
+    return estudiante.nivelIngles.toLowerCase().startsWith("advanced") ? "advanced" : "intermedio";
+}
+
+// Solo puede subir si: hay sesión iniciada, Supabase está listo, el
+// estudiante pertenece al curso que se está mirando, y si la materia
+// tiene niveles, que además coincida con el nivel del estudiante.
+function puedeSubirAqui() {
+    if (!currentUser || !supabaseListo() || !currentCourse) return { ok: false, motivo: "sesion" };
+
+    const yo = (typeof estudiantesDB !== "undefined" ? estudiantesDB : []).find(e => e.id === currentUser.id);
+    if (!yo) return { ok: false, motivo: "sesion" };
+
+    if (yo.curso !== currentCourse) return { ok: false, motivo: "curso" };
+
+    if (currentNivelId && nivelIdDeEstudiante(yo) !== currentNivelId) {
+        return { ok: false, motivo: "nivel" };
+    }
+
+    return { ok: true };
+}
+
 async function subirArchivos(files) {
-    if (!currentUser || !supabaseListo() || !currentMateriaId) return;
+    if (!puedeSubirAqui().ok || !currentMateriaId) return;
     const demasiadoGrandes = Array.from(files).filter(f => f.size > MAX_FILE_SIZE);
     if (demasiadoGrandes.length > 0) {
         alert(`"${demasiadoGrandes[0].name}" pesa demasiado (máximo 50 MB).`);
@@ -269,45 +301,59 @@ async function subirArchivos(files) {
         await loadMateriaArchivos(currentMateriaId);
     } catch (err) {
         console.error(err);
-        alert("Error al subir. Revisá la consola (F12).");
+        alert("Error al subir. Revisa la consola (F12).");
     } finally {
         dropzone.classList.remove("dragging");
-        dropzone.querySelector("p").innerHTML = `Arrastrá un archivo acá, o <span class="dropzone-link">hacé click</span> (máx. 50 MB)`;
+        dropzone.querySelector("p").innerHTML = `Arrastra un archivo aquí, o <span class="dropzone-link">haz clic</span> (máx. 50 MB)`;
         materiaFileInput.value = "";
     }
 }
 
 function updateUploadUI() {
-    if (currentUser && supabaseListo()) {
+    const estado = puedeSubirAqui();
+    if (estado.ok) {
         dropzone.style.display = "block";
         uploadLoginHint.style.display = "none";
     } else {
         dropzone.style.display = "none";
         uploadLoginHint.style.display = "block";
-        uploadLoginHint.textContent = supabaseListo()
-            ? "Iniciá sesión para subir archivos."
-            : "Supabase todavía no está configurado.";
+        if (!supabaseListo()) {
+            uploadLoginHint.textContent = "Supabase todavía no está configurado.";
+        } else if (estado.motivo === "curso") {
+            uploadLoginHint.textContent = "Solo los estudiantes de este curso pueden subir archivos aquí.";
+        } else if (estado.motivo === "nivel") {
+            uploadLoginHint.textContent = "Este nivel de inglés no es el tuyo — no puedes subir archivos aquí.";
+        } else {
+            uploadLoginHint.textContent = "Inicia sesión para subir archivos.";
+        }
     }
 }
 
 /* ===== CURSOS ===== */
 
+function getCourseCardImage(course) {
+    const gal = (typeof galeriaDB !== "undefined" ? galeriaDB[course.id] : null) || [];
+    if (gal.length > 0) {
+        const pick = gal[Math.floor(Math.random() * gal.length)];
+        return pick.ruta;
+    }
+    return course.imagen || "";
+}
+
 function renderCourses() {
     const courses = typeof cursosDB !== "undefined" ? cursosDB : [];
     coursesTrack.innerHTML = "";
     if (courses.length === 0) {
-        coursesTrack.innerHTML = `<p class="courses-empty">No hay cursos todavia</p>`;
+        coursesTrack.innerHTML = `<p class="courses-empty">No hay cursos todavía</p>`;
         return;
     }
     courses.forEach(course => {
         const card = document.createElement("div");
         card.classList.add("card");
-        card.setAttribute("role", "button");
-        card.setAttribute("tabindex", "0");
 
         const thumb = document.createElement("div");
         thumb.classList.add("thumb");
-        thumb.appendChild(buildPhotoSlot(course.imagen, course.nombre));
+        thumb.appendChild(buildPhotoSlot(getCourseCardImage(course), course.nombre));
         card.appendChild(thumb);
 
         const info = document.createElement("div");
@@ -315,13 +361,23 @@ function renderCourses() {
         info.innerHTML = `<span class="eyebrow">Curso</span><h3>${course.nombre}</h3>`;
         card.appendChild(info);
 
-        card.addEventListener("click", () => openCourseFullscreen(course.id));
-        card.addEventListener("keydown", (e) => {
-            if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                openCourseFullscreen(course.id);
-            }
-        });
+        if (course.disabled) {
+            card.classList.add("card-disabled");
+            const badge = document.createElement("span");
+            badge.classList.add("card-disabled-badge");
+            badge.textContent = "Próximamente";
+            card.appendChild(badge);
+        } else {
+            card.setAttribute("role", "button");
+            card.setAttribute("tabindex", "0");
+            card.addEventListener("click", () => openCourseFullscreen(course.id));
+            card.addEventListener("keydown", (e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    openCourseFullscreen(course.id);
+                }
+            });
+        }
 
         coursesTrack.appendChild(card);
     });
@@ -480,47 +536,67 @@ function renderHorarioMobile(rows) {
         panel.classList.add("day-panel");
         if (dayIdx === 0) panel.classList.add("active");
 
-        // A diferencia de la tabla de escritorio, acá NO fusionamos las
-        // materias seguidas en una sola tarjeta — quedan separadas, pero
-        // marcamos el conector entre ellas para que se note que son la
-        // misma clase continuando.
+        // Primera pasada: armamos la lista de entradas del día con su
+        // "key" (materia+profesor) para saber cuáles son continuación
+        // de la anterior.
+        const entries = [];
         let prevKey = null;
-        let prevLineEl = null;
-
         rows.forEach(row => {
-            let built;
-
             if (row.tipo === "recreo") {
-                built = buildTimelineItem(row.hora, buildRecreoCard(row), false);
+                entries.push({ type: "recreo", row });
                 prevKey = null;
-                prevLineEl = null;
-            } else {
-                const cell = row[day];
-                if (!cell) {
-                    built = buildTimelineItem(row.hora.split(" - ")[0], buildLibreCard(), false);
-                    prevKey = null;
-                    prevLineEl = null;
-                } else {
-                    const key = cellKey(cell);
-                    const isContinuation = key === prevKey;
-                    if (isContinuation && prevLineEl) prevLineEl.classList.add("connected");
-                    built = buildTimelineItem(row.hora.split(" - ")[0], buildMateriaCard(cell), isContinuation);
-                    prevKey = key;
-                    prevLineEl = built.lineEl;
-                }
+                return;
+            }
+            const cell = row[day];
+            if (!cell) {
+                entries.push({ type: "libre", row });
+                prevKey = null;
+                return;
+            }
+            const key = cellKey(cell);
+            entries.push({ type: "materia", row, cell, key, isContinuation: key === prevKey });
+            prevKey = key;
+        });
+
+        // Segunda pasada: con el "de al lado" ya sabemos si esta entrada
+        // es sola, el inicio de un bloque, la mitad, o el final — para
+        // fusionar visualmente las que son la misma materia seguida
+        // (estilo Material You: un solo bloque con esquinas compartidas).
+        entries.forEach((entry, idx) => {
+            const next = entries[idx + 1];
+            const nextIsSame = entry.type === "materia" && next && next.type === "materia" && next.key === entry.key;
+
+            let position = "solo";
+            if (entry.type === "materia") {
+                if (!entry.isContinuation && nextIsSame) position = "start";
+                else if (entry.isContinuation && nextIsSame) position = "middle";
+                else if (entry.isContinuation && !nextIsSame) position = "end";
             }
 
-            panel.appendChild(built.item);
+            let cardEl, horaLabel;
+            if (entry.type === "recreo") {
+                cardEl = buildRecreoCard(entry.row);
+                horaLabel = entry.row.hora;
+            } else if (entry.type === "libre") {
+                cardEl = buildLibreCard();
+                horaLabel = entry.row.hora.split(" - ")[0];
+            } else {
+                cardEl = buildMateriaCard(entry.cell);
+                horaLabel = entry.row.hora.split(" - ")[0];
+            }
+
+            const item = buildTimelineItem(horaLabel, cardEl, position);
+            panel.appendChild(item);
         });
 
         dayTrack.appendChild(panel);
     });
 }
 
-function buildTimelineItem(horaLabel, cardEl, isContinuation) {
+function buildTimelineItem(horaLabel, cardEl, position) {
     const item = document.createElement("div");
     item.classList.add("timeline-item");
-    if (isContinuation) item.classList.add("continuation");
+    if (position !== "solo") item.classList.add("chain-" + position);
 
     const timeCol = document.createElement("div");
     timeCol.classList.add("timeline-time-col");
@@ -531,15 +607,16 @@ function buildTimelineItem(horaLabel, cardEl, isContinuation) {
     connector.classList.add("timeline-connector");
     const dotEl = document.createElement("span");
     dotEl.classList.add("timeline-dot");
-    if (isContinuation) dotEl.classList.add("hollow");
+    if (position === "middle" || position === "end") dotEl.classList.add("hollow");
     const lineEl = document.createElement("span");
     lineEl.classList.add("timeline-line");
+    if (position === "start" || position === "middle") lineEl.classList.add("connected");
     connector.appendChild(dotEl);
     connector.appendChild(lineEl);
     item.appendChild(connector);
 
     item.appendChild(cardEl);
-    return { item, lineEl };
+    return item;
 }
 
 function buildRecreoCard(row) {
@@ -591,13 +668,28 @@ function setProfPhoto(url) {
     }
 }
 
-function openMateriaModal(materiaId, profesorId) {
-    const materia = findMateria(materiaId);
-    const profesor = findProfesor(profesorId);
+function renderNivelTabs(niveles) {
+    materiaNiveles.style.display = "flex";
+    materiaNiveles.innerHTML = "";
+    niveles.forEach((nivel, idx) => {
+        const tab = document.createElement("button");
+        tab.classList.add("nivel-tab");
+        if (idx === 0) tab.classList.add("active");
+        tab.textContent = nivel.nombre;
+        tab.addEventListener("click", () => {
+            document.querySelectorAll(".nivel-tab").forEach(t => t.classList.remove("active"));
+            tab.classList.add("active");
+            showNivel(nivel);
+        });
+        materiaNiveles.appendChild(tab);
+    });
+}
 
-    currentMateriaId = materiaId;
-    materiaModalNombre.textContent = materia ? materia.nombre : materiaId;
+function showNivel(nivel) {
+    currentNivelId = nivel.id;
+    currentMateriaId = currentMateriaBaseId + "::" + nivel.id;
 
+    const profesor = findProfesor(nivel.profesor);
     if (profesor) {
         setProfPhoto(profesor.foto || "");
         materiaModalProfNombre.textContent = profesor.nombre;
@@ -606,8 +698,38 @@ function openMateriaModal(materiaId, profesorId) {
         materiaModalProfNombre.textContent = "Profesor sin asignar";
     }
 
-    loadMateriaArchivos(materiaId);
+    loadMateriaArchivos(currentMateriaId);
     updateUploadUI();
+}
+
+function openMateriaModal(materiaId, profesorId) {
+    const materia = findMateria(materiaId);
+    currentMateriaBaseId = materiaId;
+    materiaModalNombre.textContent = materia ? materia.nombre : materiaId;
+
+    if (materia && materia.niveles && materia.niveles.length > 0) {
+        // Esta materia se separa por nivel de inglés: cada nivel tiene
+        // su propio profesor y sus propios archivos.
+        renderNivelTabs(materia.niveles);
+        showNivel(materia.niveles[0]);
+    } else {
+        // Materia normal, sin separación por nivel.
+        materiaNiveles.style.display = "none";
+        currentNivelId = null;
+        currentMateriaId = materiaId;
+
+        const profesor = findProfesor(profesorId);
+        if (profesor) {
+            setProfPhoto(profesor.foto || "");
+            materiaModalProfNombre.textContent = profesor.nombre;
+        } else {
+            setProfPhoto("");
+            materiaModalProfNombre.textContent = "Profesor sin asignar";
+        }
+
+        loadMateriaArchivos(currentMateriaId);
+        updateUploadUI();
+    }
 
     materiaModalOverlay.classList.add("active");
     lockScroll();
@@ -616,6 +738,8 @@ function openMateriaModal(materiaId, profesorId) {
 function closeMateriaModal() {
     materiaModalOverlay.classList.remove("active");
     currentMateriaId = null;
+    currentMateriaBaseId = null;
+    currentNivelId = null;
     unlockScroll();
 }
 
@@ -651,7 +775,7 @@ function renderGaleria(courseId) {
     galeriaTrack.style.animation = "none";
 
     if (list.length === 0) {
-        galeriaTrack.innerHTML = `<p class="galeria-empty">Sin fotos en la galeria todavia</p>`;
+        galeriaTrack.innerHTML = `<p class="galeria-empty">Sin fotos en la galería todavía</p>`;
         return;
     }
 
@@ -682,10 +806,16 @@ function updateAuthUI() {
         loginBtn.style.display = "none";
         userChip.style.display = "flex";
         userChipName.textContent = currentUser.nombre;
+
+        const yo = (typeof estudiantesDB !== "undefined" ? estudiantesDB : []).find(e => e.id === currentUser.id);
+        userChipAvatar.innerHTML = "";
+        userChipAvatar.appendChild(buildPhotoSlot(yo ? yo.foto : "", currentUser.nombre));
     } else {
         loginBtn.style.display = "inline-flex";
         userChip.style.display = "none";
+        userChip.classList.remove("open");
     }
+    if (materiaModalOverlay.classList.contains("active")) updateUploadUI();
 }
 
 loginBtn.addEventListener("click", () => {
@@ -725,7 +855,25 @@ function intentarLogin() {
     closeLoginModal();
 }
 
-logoutBtn.addEventListener("click", () => {
+// Menú del chip de usuario (Perfil / Cerrar sesión)
+
+userChipBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    userChip.classList.toggle("open");
+});
+
+document.addEventListener("click", (e) => {
+    if (!userChip.contains(e.target)) userChip.classList.remove("open");
+});
+
+userMenuPerfil.addEventListener("click", () => {
+    userChip.classList.remove("open");
+    if (!currentUser) return;
+    const yo = (typeof estudiantesDB !== "undefined" ? estudiantesDB : []).find(e => e.id === currentUser.id);
+    if (yo) openStudentModal(yo);
+});
+
+userMenuLogout.addEventListener("click", () => {
     currentUser = null;
     sessionStorage.removeItem("oasis_session");
     updateAuthUI();
@@ -741,7 +889,7 @@ function renderStudentsTrack(courseId) {
     const list = (typeof estudiantesDB !== "undefined" ? estudiantesDB : []).filter(e => e.curso === courseId);
     studentsTrack.innerHTML = "";
     if (list.length === 0) {
-        studentsTrack.innerHTML = `<p class="students-empty">Sin estudiantes todavia</p>`;
+        studentsTrack.innerHTML = `<p class="students-empty">Sin estudiantes todavía</p>`;
         return;
     }
     list.forEach(s => {
@@ -812,3 +960,28 @@ function closeStudentModal() {
 
 studentModalClose.addEventListener("click", closeStudentModal);
 studentModalOverlay.addEventListener("click", e => { if (e.target === studentModalOverlay) closeStudentModal(); });
+
+/* =========================================================
+   TELEFONO — click para copiar
+   ========================================================= */
+
+const phoneChip = document.getElementById("phoneChip");
+const phoneChipText = document.getElementById("phoneChipText");
+
+if (phoneChip) {
+    const numeroOriginal = phoneChipText.textContent;
+
+    phoneChip.addEventListener("click", async () => {
+        try {
+            await navigator.clipboard.writeText(numeroOriginal);
+        } catch {
+            // Si el navegador no permite el portapapeles (poco comun), no rompemos nada.
+        }
+        phoneChip.classList.add("copied");
+        phoneChipText.textContent = "Copiado!";
+        setTimeout(() => {
+            phoneChip.classList.remove("copied");
+            phoneChipText.textContent = numeroOriginal;
+        }, 1500);
+    });
+}

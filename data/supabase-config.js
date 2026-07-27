@@ -1,13 +1,13 @@
 // Reemplazá estos dos valores con los de tu proyecto de Supabase.
 //
 // Pasos para crear el proyecto (gratis, SIN tarjeta):
-// 1. supabase.com → Start your project → creá cuenta (con GitHub es más rápido)
-// 2. "New project" → nombre "oasis" → contraseña de base de datos (guardala,
+// 1. supabase.com → Start your project → crea una cuenta (con GitHub es más rápido)
+// 2. "New project" → nombre "oasis" → contraseña de base de datos (guárdala,
 //    no la vas a necesitar en el código, pero por las dudas) → región más
 //    cercana (ej. East US) → Create new project (tarda ~1-2 min en armarse)
 //
-// 3. Andá a "SQL Editor" (ícono de la izquierda) → "New query" → pegá esto
-//    completo y le das Run:
+// 3. Ve a "SQL Editor" (ícono de la izquierda) → "New query" → pega esto
+//    completo y presiona Run:
 //
 //    create table archivos (
 //      id bigint generated always as identity primary key,
@@ -32,11 +32,11 @@
 //      for delete using (true);
 //
 // 4. Andá a "Storage" (ícono de la izquierda) → "New bucket" → nombre
-//    "archivos" → activá "Public bucket" → Create bucket
+//    "archivos" → activa "Public bucket" → Create bucket
 //
 //    OJO: "Public bucket" solo habilita LEER archivos. Para poder SUBIR,
-//    hace falta agregar políticas aparte. Andá a "SQL Editor" → "New query"
-//    → pegá esto y Run:
+//    hace falta agregar políticas aparte. Ve a "SQL Editor" → "New query"
+//    → pégalo y presiona Run:
 //
 //    create policy "acceso publico archivos - leer"
 //    on storage.objects for select
@@ -51,14 +51,14 @@
 //    using ( bucket_id = 'archivos' );
 //
 // 5. Andá a "Project Settings" (ícono de tuerca abajo) → "Data API" →
-//    copiá la "Project URL" y pegala en SUPABASE_URL más abajo
+//    copia la "Project URL" y pégala en SUPABASE_URL más abajo
 //
-// 6. En la misma pantalla (o en "API Keys") copiá la "anon public" key
-//    y pegala en SUPABASE_ANON_KEY
+// 6. En la misma pantalla (o en "API Keys") copia la "anon public" key
+//    y pégala en SUPABASE_ANON_KEY
 //
 // Nota sobre seguridad: estas reglas son abiertas (cualquiera puede
 // leer/subir/borrar) porque no hay backend real verificando quién sos.
-// El botón de borrar solo se MUESTRA si sos el que subió el archivo,
+// El botón de borrar solo se MUESTRA si eres quien subió el archivo,
 // pero alguien con conocimientos técnicos podría saltarse eso. Para
 // este proyecto (compañeros de curso) es un riesgo aceptable.
 

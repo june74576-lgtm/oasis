@@ -22,7 +22,7 @@ const profesoresDB = [
     },
     {
         id: "fabrizzio",
-        nombre: "Fabrizzio Medina",
+        nombre: "Fabrizzio Roberto Medina Macias",
         foto: "fotos_profesores/medinafabrizzio.jpg"
     },
     {
@@ -58,7 +58,7 @@ const profesoresDB = [
     },
     {
         id: "coronel",
-        nombre: "Camilo Coronel",
+        nombre: "Camilo Jacinto Coronel Escobar",
         foto: "fotos_profesores/coronelcamilo.jpg"
     },
     {
@@ -78,7 +78,7 @@ const profesoresDB = [
     },
     {
         id: "valdires",
-        nombre: "Josue Fernando Valdires Davila",
+        nombre: "Josué Fernando Valdires Davila",
         foto: "fotos_profesores/valdiresjosue.jpg"
     },
     {
@@ -97,9 +97,9 @@ const profesoresDB = [
         foto: "fotos_profesores/corozomanuel.jpg"
     },
     {
-    id: "oscar",
-    nombre: "Oscar Ricardo Suarez Mendez",
-    foto: "fotos_profesores/suarezoscar.jpg"
+        id: "oscar",
+        nombre: "Oscar Ricardo Suarez Mendez",
+        foto: "fotos_profesores/suarezoscar.jpg"
     },
     {
         id: "herbozo",

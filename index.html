@@ -4,32 +4,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oasis</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,300..800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,300..800&family=Anton&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="style.css">
 
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="data/supabase-config.js"></script>
+    <script src="data/supabase-config.js?v=2"></script>
 <base target="_blank">
 </head>
 <body>
 
 <header>
     <div class="topbar">
-        <span class="brand">OASIS</span>
+        <div class="brand-group">
+            <svg class="brand-logo" width="20" height="20" viewBox="0 0 56 56" fill="none" aria-hidden="true">
+                <g transform="translate(28,28)" stroke="url(#roseGradSmall)" stroke-width="3" stroke-linejoin="round" fill="none">
+                    <path d="M0,-3 C4,-9 4,-17 0,-21 C-4,-17 -4,-9 0,-3 Z" transform="rotate(0)"/>
+                    <path d="M0,-3 C4,-9 4,-17 0,-21 C-4,-17 -4,-9 0,-3 Z" transform="rotate(72)"/>
+                    <path d="M0,-3 C4,-9 4,-17 0,-21 C-4,-17 -4,-9 0,-3 Z" transform="rotate(144)"/>
+                    <path d="M0,-3 C4,-9 4,-17 0,-21 C-4,-17 -4,-9 0,-3 Z" transform="rotate(216)"/>
+                    <path d="M0,-3 C4,-9 4,-17 0,-21 C-4,-17 -4,-9 0,-3 Z" transform="rotate(288)"/>
+                    <circle r="4.5" fill="url(#roseGradSmall)" stroke="none"/>
+                </g>
+                <defs>
+                    <linearGradient id="roseGradSmall" x1="0" y1="0" x2="56" y2="56">
+                        <stop offset="0" style="stop-color:#c6b8ff"/>
+                        <stop offset="1" style="stop-color:#f0b7d0"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+            <span class="brand">OASIS</span>
+        </div>
 
         <div class="auth" id="authArea">
-            <button class="btn-filled small" id="loginBtn">Iniciar sesion</button>
+            <button class="btn-filled small" id="loginBtn">Iniciar sesión</button>
 
             <div class="user-chip" id="userChip" style="display:none;">
-                <span id="userChipName"></span>
-                <button id="logoutBtn" aria-label="Salir">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+                <button class="user-chip-btn" id="userChipBtn">
+                    <span class="user-chip-avatar" id="userChipAvatar"></span>
+                    <span id="userChipName"></span>
+                    <svg class="user-chip-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                 </button>
+
+                <div class="user-menu" id="userMenu">
+                    <button id="userMenuPerfil" class="user-menu-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 19.5c0-3.5 3-6 7-6s7 2.5 7 6"/></svg>
+                        Perfil
+                    </button>
+                    <button id="userMenuLogout" class="user-menu-item danger">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4.5H6.5A1.5 1.5 0 0 0 5 6v12a1.5 1.5 0 0 0 1.5 1.5H9M15 15.5l4-4-4-4M19 11.5H9"/></svg>
+                        Cerrar sesión
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -42,14 +73,20 @@
     <div class="app-card">
         <div class="logomark" aria-hidden="true">
             <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
-                <circle cx="28" cy="28" r="19" style="stroke:url(#ringGrad)" stroke-width="6"/>
-                <path d="M6 34 Q16 24 28 34 T50 34" style="stroke:url(#waveGrad)" stroke-width="5" stroke-linecap="round" fill="none"/>
+                <g transform="translate(28,28)" stroke="url(#roseGrad)" stroke-width="2.4" stroke-linejoin="round" fill="none">
+                    <path d="M0,-3 C4,-9 4,-17 0,-21 C-4,-17 -4,-9 0,-3 Z" transform="rotate(0)"/>
+                    <path d="M0,-3 C4,-9 4,-17 0,-21 C-4,-17 -4,-9 0,-3 Z" transform="rotate(72)"/>
+                    <path d="M0,-3 C4,-9 4,-17 0,-21 C-4,-17 -4,-9 0,-3 Z" transform="rotate(144)"/>
+                    <path d="M0,-3 C4,-9 4,-17 0,-21 C-4,-17 -4,-9 0,-3 Z" transform="rotate(216)"/>
+                    <path d="M0,-3 C4,-9 4,-17 0,-21 C-4,-17 -4,-9 0,-3 Z" transform="rotate(288)"/>
+                    <circle r="4.5" fill="url(#roseGradCenter)" stroke="none"/>
+                </g>
                 <defs>
-                    <linearGradient id="ringGrad" x1="0" y1="0" x2="56" y2="56">
+                    <linearGradient id="roseGrad" x1="0" y1="0" x2="56" y2="56">
                         <stop offset="0" style="stop-color:#c6b8ff"/>
                         <stop offset="1" style="stop-color:#f0b7d0"/>
                     </linearGradient>
-                    <linearGradient id="waveGrad" x1="6" y1="34" x2="50" y2="34">
+                    <linearGradient id="roseGradCenter" x1="0" y1="0" x2="56" y2="56">
                         <stop offset="0" style="stop-color:#f0b7d0"/>
                         <stop offset="1" style="stop-color:#c6b8ff"/>
                     </linearGradient>
@@ -57,7 +94,7 @@
             </svg>
         </div>
         <h1>OASIS</h1>
-        <p class="tagline">Segundo Informatica - Portal de clase</p>
+        <p class="tagline">Segundo Bachillerato · Portal de clase</p>
     </div>
 </section>
 
@@ -75,13 +112,17 @@
 </section>
 
 <section class="about" id="about">
-    <h2>Todo en un solo lugar</h2>
+    <h2>¿ENCONTRASTE ALGÚN ERROR?</h2>
     <div class="divider-pill"></div>
-    <p>Si hay algun error en alguna fecha, nombre o cualquier otro dato, escribeme al whatsapp para corregirlo.</p>
+    <p>Escríbeme al WhatsApp si hay algún error en alguna fecha, nombre o cualquier otro dato. O si quieres añadir tu curso. ^^</p>
+    <button class="phone-chip" id="phoneChip" type="button" aria-label="Copiar número de teléfono">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 3.5h3l1.5 4-2 1.5a11 11 0 0 0 5 5l1.5-2 4 1.5v3a1.5 1.5 0 0 1-1.6 1.5A16 16 0 0 1 5 6.1 1.5 1.5 0 0 1 6.5 3.5Z"/></svg>
+        <span id="phoneChipText">+593 98 027 1168</span>
+    </button>
 </section>
 
 <footer>
-    <p>Oasis</p>
+    <p>Hecho con ❤︎ por Juan Quichimbo.</p>
 </footer>
 
 <!-- Curso a pantalla completa -->
@@ -112,7 +153,7 @@
             <div class="horario-wrapper">
                 <table class="horario" id="horarioTable">
                     <thead>
-                        <tr><th>Hora</th><th>Lunes</th><th>Martes</th><th>Miercoles</th><th>Jueves</th><th>Viernes</th></tr>
+                        <tr><th>Hora</th><th>Lunes</th><th>Martes</th><th>Miércoles</th><th>Jueves</th><th>Viernes</th></tr>
                     </thead>
                     <tbody id="horarioBody"></tbody>
                 </table>
@@ -140,10 +181,10 @@
             </div>
         </section>
 
-        <!-- Galeria -->
+        <!-- Galería -->
         <section class="fs-section">
             <div class="fs-section-header">
-                <h2>Galeria</h2>
+                <h2>Galería</h2>
                 <div class="divider-pill"></div>
             </div>
             <div class="galeria-viewport">
@@ -166,7 +207,7 @@
         <h3 id="studentModalName"></h3>
         <div class="mini-details">
             <p><span>Nacimiento</span><strong id="studentModalBirth">-</strong></p>
-            <p><span>Nivel de ingles</span><strong id="studentModalIngles">-</strong></p>
+            <p><span>Nivel de inglés</span><strong id="studentModalIngles">-</strong></p>
             <p><span>Contribuciones</span><strong id="studentModalContrib">-</strong></p>
         </div>
     </div>
@@ -179,6 +220,8 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
         </button>
         <h3 id="materiaModalNombre"></h3>
+
+        <div class="materia-niveles" id="materiaNiveles" style="display:none;"></div>
 
         <div class="materia-profesor">
             <div class="prof-photo-wrap">
@@ -193,9 +236,9 @@
 
         <div class="dropzone" id="dropzone" style="display:none;">
             <input type="file" id="materiaFileInput" multiple hidden>
-            <p>Arrastra un archivo aca, o <span class="dropzone-link">hace click</span> (max. 50 MB)</p>
+            <p>Arrastra un archivo aquí, o <span class="dropzone-link">haz clic</span> (máx. 50 MB)</p>
         </div>
-        <p class="login-hint" id="uploadLoginHint">Inicia sesion para subir archivos.</p>
+        <p class="login-hint" id="uploadLoginHint">Inicia sesión para subir archivos.</p>
     </div>
 </div>
 
@@ -205,11 +248,11 @@
         <button class="modal-close" id="loginModalClose" aria-label="Cerrar">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
         </button>
-        <h3>Iniciar sesion</h3>
+        <h3>Iniciar sesión</h3>
         <div class="login-form">
             <input type="text" id="loginUsername" placeholder="Usuario" autocomplete="username">
-            <input type="password" id="loginPassword" placeholder="Contrasena" autocomplete="current-password">
-            <p class="login-error" id="loginError" style="display:none;">Usuario o contrasena incorrectos</p>
+            <input type="password" id="loginPassword" placeholder="Contraseña" autocomplete="current-password">
+            <p class="login-error" id="loginError" style="display:none;">Usuario o contraseña incorrectos</p>
             <button id="loginSubmitBtn" class="btn-filled">Entrar</button>
         </div>
     </div>
@@ -220,12 +263,12 @@
      numero de ?v= correspondiente (ej. ?v=1 -> ?v=2). Así el navegador
      sabe que cambio y lo vuelve a descargar en vez de usar el que tenia
      guardado en cache. -->
-<script src="data/cursos.js?v=3"></script>
+<script src="data/cursos.js?v=4"></script>
 <script src="data/profesores.js?v=3"></script>
-<script src="data/materias.js?v=3"></script>
+<script src="data/materias.js?v=4"></script>
 <script src="data/horarios.js?v=3"></script>
 <script src="data/galeria.js?v=3"></script>
 <script src="data/estudiantes.js?v=3"></script>
-<script src="script.js?v=3"></script>
+<script src="script.js?v=5"></script>
 </body>
 </html>

@@ -45,6 +45,9 @@ header{
 
 .topbar{ width:90%; max-width:1100px; margin:auto; padding:16px 0; display:flex; justify-content:space-between; align-items:center; }
 
+.brand-group{ display:flex; align-items:center; gap:8px; }
+.brand-logo{ flex-shrink:0; }
+
 .brand{
     color:var(--primary); letter-spacing:4px; font-weight:700;
     font-variation-settings:"wght" 700; font-size:15px;
@@ -128,6 +131,17 @@ header{
 .eyebrow{ display:block; color:var(--tertiary); font-size:11px; letter-spacing:2px; text-transform:uppercase; font-variation-settings:"wght" 600; margin-bottom:8px; }
 .card h3{ font-size:19px; font-variation-settings:"wght" 600; }
 
+.card-disabled{
+    position:relative; cursor:not-allowed; opacity:.5; filter:grayscale(.85);
+}
+.card-disabled:hover{ transform:none; border-color:var(--outline); }
+.card-disabled-badge{
+    position:absolute; top:14px; right:14px; z-index:2;
+    background:rgba(10,9,12,.7); backdrop-filter:blur(6px);
+    color:#fff; font-size:10px; letter-spacing:1px; text-transform:uppercase;
+    padding:5px 12px; border-radius:var(--radius-full); font-variation-settings:"wght" 600;
+}
+
 .courses-empty{ color:var(--on-surface-var); font-size:14px; font-style:italic; padding:20px; }
 
 /* ===== Tarjetas de estudiante ===== */
@@ -184,7 +198,23 @@ header{
 /* ===== About ===== */
 
 .about{ text-align:center; padding:110px 15%; background:var(--surface); }
-.about h2{ font-size:38px; font-variation-settings:"wght" 700; }
+.about h2{
+    font-family:"Anton", "Roboto Flex", system-ui, sans-serif;
+    font-size:46px; letter-spacing:.5px; font-weight:400;
+    background:linear-gradient(90deg, var(--primary), var(--tertiary));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+
+.phone-chip{
+    display:inline-flex; align-items:center; gap:10px;
+    background:var(--surface-1); border:1px solid var(--outline);
+    border-radius:var(--radius-full); padding:12px 22px; margin-top:22px;
+    cursor:pointer; transition:.2s; font-size:16px; letter-spacing:.5px;
+    color:var(--on-surface); font-variation-settings:"wght" 600;
+}
+.phone-chip:hover{ border-color:var(--primary); background:var(--surface-2); }
+.phone-chip svg{ width:17px; height:17px; color:var(--primary); flex-shrink:0; }
+.phone-chip.copied{ border-color:var(--primary); color:var(--primary); }
 .about p{ margin-top:28px; color:var(--on-surface-var); line-height:2; font-size:17px; }
 
 /* ===== Footer ===== */
@@ -201,7 +231,12 @@ footer{ text-align:center; padding:34px; background:var(--bg); border-top:1px so
     transform:translateY(24px); opacity:0; pointer-events:none;
     transition:.35s ease;
     -webkit-overflow-scrolling:touch;
+    scrollbar-width:thin; scrollbar-color:var(--surface-3) transparent;
 }
+.course-fullscreen::-webkit-scrollbar{ width:8px; }
+.course-fullscreen::-webkit-scrollbar-track{ background:transparent; }
+.course-fullscreen::-webkit-scrollbar-thumb{ background:var(--surface-3); border-radius:var(--radius-full); }
+.course-fullscreen::-webkit-scrollbar-thumb:hover{ background:var(--primary-container); }
 .course-fullscreen.active{ transform:translateY(0); opacity:1; pointer-events:all; }
 
 .fs-topbar{
@@ -297,10 +332,25 @@ table.horario td.libre-cell{ color:var(--on-surface-var); font-style:italic; fon
 .timeline-dot{ width:9px; height:9px; border-radius:50%; background:var(--primary); margin-top:16px; flex-shrink:0; }
 .timeline-dot.hollow{ background:var(--surface-2); border:2px solid var(--primary); width:7px; height:7px; }
 .timeline-line{ flex:1; width:2px; background:var(--outline); margin-top:4px; min-height:10px; }
-.timeline-line.connected{ background:var(--primary); }
+.timeline-line.connected{ background:var(--primary); opacity:.5; }
 .timeline-item:last-child .timeline-line{ visibility:hidden; }
-.timeline-item.continuation{ margin-top:-8px; }
-.timeline-item.continuation .timeline-card{ padding-top:9px; padding-bottom:9px; }
+
+/* Cuando dos o más franjas seguidas son la misma materia, se fusionan
+   en un solo bloque continuo (mismo criterio que las listas agrupadas
+   de Material You), con una línea finita entre ellas en vez de hueco. */
+.timeline-item.chain-start,
+.timeline-item.chain-middle{ margin-bottom:1px; }
+.timeline-item.chain-start .timeline-card{
+    border-radius:var(--radius-lg) var(--radius-lg) 4px 4px;
+    padding-top:10px; padding-bottom:9px;
+}
+.timeline-item.chain-middle .timeline-card{
+    border-radius:4px; padding-top:9px; padding-bottom:9px;
+}
+.timeline-item.chain-end .timeline-card{
+    border-radius:4px 4px var(--radius-lg) var(--radius-lg);
+    padding-top:9px; padding-bottom:10px;
+}
 
 .timeline-card{
     flex:1; background:var(--surface-3); border-radius:var(--radius-lg);
@@ -368,7 +418,9 @@ table.horario td.libre-cell{ color:var(--on-surface-var); font-style:italic; fon
     border-radius:32px; padding:40px 32px 34px; width:100%; max-width:440px;
     text-align:center; box-shadow:0 30px 80px rgba(0,0,0,.5);
     max-height:85vh; overflow-y:auto; overscroll-behavior:contain;
+    scrollbar-width:none;
 }
+.mini-modal::-webkit-scrollbar{ display:none; }
 
 .mini-modal h3{ font-size:22px; font-variation-settings:"wght" 700; }
 
@@ -384,6 +436,17 @@ table.horario td.libre-cell{ color:var(--on-surface-var); font-style:italic; fon
     margin-top:20px; background:var(--surface-1); border-radius:var(--radius-lg); padding:14px 18px;
 }
 .materia-profesor span{ font-size:15px; text-align:left; }
+
+.materia-niveles{
+    display:flex; gap:8px; justify-content:center; margin-top:18px; flex-wrap:wrap;
+}
+.nivel-tab{
+    background:var(--surface-3); color:var(--on-surface-var); border:none;
+    padding:9px 18px; border-radius:var(--radius-full); font-size:12.5px;
+    cursor:pointer; transition:.2s; font-variation-settings:"wght" 600;
+}
+.nivel-tab:hover{ background:var(--surface-2); color:var(--on-surface); }
+.nivel-tab.active{ background:var(--primary); color:var(--on-primary); }
 
 .mini-subhead{ margin-top:20px; text-align:left; font-size:12px; letter-spacing:1px; text-transform:uppercase; color:var(--tertiary); }
 
@@ -432,14 +495,45 @@ table.horario td.libre-cell{ color:var(--on-surface-var); font-style:italic; fon
 
 .auth{ display:flex; align-items:center; }
 
-.user-chip{
-    display:flex; align-items:center; gap:10px;
+.user-chip{ position:relative; }
+
+.user-chip-btn{
+    display:flex; align-items:center; gap:9px;
     background:var(--surface-1); border:1px solid var(--outline);
-    padding:7px 14px 7px 16px; border-radius:var(--radius-full); font-size:13px;
+    padding:6px 14px 6px 6px; border-radius:var(--radius-full); font-size:13px;
+    color:var(--on-surface); cursor:pointer; transition:.2s; font-family:inherit;
 }
-.user-chip button{ background:none; border:none; color:var(--on-surface-var); cursor:pointer; display:flex; }
-.user-chip button svg{ width:15px; height:15px; }
-.user-chip button:hover{ color:#ff8a8a; }
+.user-chip-btn:hover{ border-color:var(--primary); }
+
+.user-chip-avatar{
+    width:26px; height:26px; border-radius:50%; overflow:hidden; flex-shrink:0;
+    display:block; background:var(--surface-3);
+}
+.user-chip-avatar .photo-slot,
+.user-chip-avatar .no-photo{ font-size:8px; }
+
+.user-chip-caret{ width:13px; height:13px; color:var(--on-surface-var); transition:.2s; flex-shrink:0; }
+.user-chip.open .user-chip-caret{ transform:rotate(180deg); }
+
+.user-menu{
+    position:absolute; top:calc(100% + 8px); right:0; z-index:50;
+    background:var(--surface-2); border:1px solid var(--outline);
+    border-radius:var(--radius-lg); padding:6px; min-width:170px;
+    box-shadow:0 20px 50px rgba(0,0,0,.45);
+    opacity:0; transform:translateY(-6px); pointer-events:none; transition:.18s;
+}
+.user-chip.open .user-menu{ opacity:1; transform:translateY(0); pointer-events:all; }
+
+.user-menu-item{
+    width:100%; display:flex; align-items:center; gap:10px;
+    background:none; border:none; color:var(--on-surface); font-size:13.5px;
+    padding:10px 12px; border-radius:var(--radius-lg); cursor:pointer;
+    text-align:left; font-family:inherit; transition:.15s;
+}
+.user-menu-item svg{ width:16px; height:16px; flex-shrink:0; color:var(--on-surface-var); }
+.user-menu-item:hover{ background:var(--surface-3); }
+.user-menu-item.danger:hover{ background:rgba(255,100,100,.12); color:#ff8a8a; }
+.user-menu-item.danger:hover svg{ color:#ff8a8a; }
 
 /* ===== Botones ===== */
 

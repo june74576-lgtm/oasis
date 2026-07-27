@@ -1,162 +1,116 @@
 const materiasDB = [
     {
-        id: "matematicas2ITA",
+        id: "matematicas",
         nombre: "Matemáticas"
     },
     {
-        id: "quimica2ITA",
+        id: "quimica",
         nombre: "Química"
     },
     {
-        id: "filosofia2ITA",
+        id: "filosofia",
         nombre: "Filosofía"
     },
     {
-        id: "lengua2ITA",
+        id: "lengua",
         nombre: "Lengua y Literatura"
     },
     {
         id: "ingles2ITA",
-        nombre: "Inglés"
+        nombre: "Inglés",
+        niveles: [
+            { id: "advanced", nombre: "Advanced", profesor: "fabrizzio" },
+            { id: "basic", nombre: "Basic", profesor: "" }
+        ]
     },
     {
-        id: "animacion2ITA",
+        id: "ingles2CNB",
+        nombre: "Inglés",
+        niveles: [
+            { id: "advanced", nombre: "Advanced", profesor: "herbozo" },
+            { id: "intermediate", nombre: "Intermediate", profesor: "" },
+            { id: "basic", nombre: "Basic", profesor: "" }
+        ]
+    },
+    {
+        id: "classroom2CNB",
+        nombre: "Classroom Community for Speaking",
+        niveles: [
+            { id: "advanced", nombre: "Advanced", profesor: "" },
+            { id: "intermediate", nombre: "Intermediate", profesor: "" },
+            { id: "basic", nombre: "Basic", profesor: "" }
+        ]
+    },
+    {
+        id: "animacion",
         nombre: "Animación a la Lectura"
     },
     {
-        id: "programacion2ITA",
+        id: "programacion",
         nombre: "Programación y Bases de Datos"
     },
     {
-        id: "fisica2ITA",
+        id: "fisica",
         nombre: "Física"
     },
     {
-        id: "emprendimiento2ITA",
+        id: "emprendimiento",
         nombre: "Emprendimiento y Gestión"
     },
     {
-        id: "civica2ITA",
+        id: "civica",
         nombre: "Cívica y Acompañamiento en el aula"
     },
     {
-        id: "robotica2ITA",
+        id: "robotica",
         nombre: "Robótica"
     },
     {
-        id: "tutoria2ITA",
+        id: "tutoria",
         nombre: "Tutoría/Misa"
     },
     {
-        id: "ciudadania2ITA",
+        id: "ciudadania",
         nombre: "Educación para la Ciudadanía"
     },
     {
-        id: "sistemas2ITA",
+        id: "sistemas",
         nombre: "Sistemas Operativos y Redes"
     },
     {
-        id: "diseno2ITA",
+        id: "diseno",
         nombre: "Diseño y Desarrollo Web"
     },
     {
-        id: "eca2ITA",
+        id: "eca",
         nombre: "E.C.A."
     },
     {
-        id: "historia2ITA",
+        id: "historia",
         nombre: "Historia"
     },
     {
-        id: "soporte2ITA",
+        id: "soporte",
         nombre: "Soporte Técnico"
     },
     {
-        id: "biologia2ITA",
+        id: "biologia",
         nombre: "Biología"
     },
     {
         id: "classroom2ITA",
-        nombre: "Classroom Community for Speaking"
+        nombre: "Classroom Community for Speaking",
+        niveles: [
+            { id: "advanced", nombre: "Advanced", profesor: "garaicoa" },
+            { id: "basic", nombre: "Basic", profesor: "" }
+        ]
     },
     {
-        id: "religion2ITA",
+        id: "religion",
         nombre: "Religión"
     },
     {
-        id: "efisica2ITA",
+        id: "efisica",
         nombre: "Educación Física"
-    },
-    {
-    id: "fisica2CNB",
-    nombre: "Física"
-    },
-    {
-        id: "quimica2CNB",
-        nombre: "Química"
-    },
-    {
-        id: "lengua2CNB",
-        nombre: "Lengua y Literatura"
-    },
-    {
-        id: "tutoria2CNB",
-        nombre: "Tutoría - Misa"
-    },
-    {
-        id: "matematicas2CNB",
-        nombre: "Matemática"
-    },
-    {
-        id: "biologia2CNB",
-        nombre: "Biología"
-    },
-    {
-        id: "animacion2CNB",
-        nombre: "Animación a la Lectura"
-    },
-    {
-        id: "religion2CNB",
-        nombre: "Religión"
-    },
-    {
-        id: "ingles2CNB",
-        nombre: "Inglés"
-    },
-    {
-        id: "efisica2CNB",
-        nombre: "Educación Física"
-    },
-    {
-        id: "eca2CNB",
-        nombre: "Educación Cultural y Artística"
-    },
-    {
-        id: "historia2CNB",
-        nombre: "Historia"
-    },
-    {
-        id: "classroom2CNB",
-        nombre: "Classroom Community for Speaking"
-    },
-    {
-        id: "ciudadania2CNB",
-        nombre: "Educación para la Ciudadanía"
-    },
-    {
-        id: "emprendimiento2CNB",
-        nombre: "Emprendimiento y Gestión"
-    },
-    {
-        id: "filosofia2CNB",
-        nombre: "Filosofía"
-    },
-    {
-        id: "robotica2CNB",
-        nombre: "Robótica"
-    },
-    {
-        id: "civica2CNB",
-        nombre: "Cívica y Acompañamiento en el Aula"
     }
 ];

@@ -2,11 +2,24 @@ const cursosDB = [
     {
         id: "2ITA",
         nombre: "2do Informática A",
-        imagen: "https://picsum.photos/400/500?1"
+    },
+    {
+        id: "2ITB",
+        nombre: "2do Informática B",
+        disabled: true
+    },
+    {
+        id: "2CNA",
+        nombre: "2do Ciencias A",
+        disabled: true
     },
     {
         id: "2CNB",
         nombre: "2do Ciencias B",
-        imagen: "https://picsum.photos/400/500?2"
+    },
+    {
+        id: "2CNC",
+        nombre: "2do Ciencias C",
+        disabled: true
     }
 ];

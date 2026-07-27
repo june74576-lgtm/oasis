@@ -3,38 +3,38 @@ const horariosDB = {
         {
             tipo: "clase",
             hora: "07:00 - 07:40",
-            Lunes: { materia: "matematicas2ITA", profesor: "moyano" },
-            Martes: { materia: "programacion2ITA", profesor: "tapia" },
-            Miercoles: { materia: "tutoria2ITA", profesor: "muniz" },
-            Jueves: { materia: "classroom2ITA", profesor: "garaicoa" },
-            Viernes: { materia: "soporte2ITA", profesor: "villamar" }
+            Lunes: { materia: "matematicas", profesor: "moyano" },
+            Martes: { materia: "programacion", profesor: "tapia" },
+            Miercoles: { materia: "tutoria", profesor: "muniz" },
+            Jueves: { materia: "classroom2ITA", profesor: "garaicoa"},
+            Viernes: { materia: "soporte", profesor: "villamar" }
         },
         {
             tipo: "clase",
             hora: "07:40 - 08:20",
-            Lunes: { materia: "matematicas2ITA", profesor: "moyano" },
-            Martes: { materia: "programacion2ITA", profesor: "tapia" },
-            Miercoles: { materia: "ciudadania2ITA", profesor: "betty" },
+            Lunes: { materia: "matematicas", profesor: "moyano" },
+            Martes: { materia: "programacion", profesor: "tapia" },
+            Miercoles: { materia: "ciudadania", profesor: "betty" },
             Jueves: { materia: "classroom2ITA", profesor: "garaicoa" },
-            Viernes: { materia: "ciudadania2ITA", profesor: "betty" }
+            Viernes: { materia: "ciudadania", profesor: "betty" }
         },
         {
             tipo: "clase",
             hora: "08:20 - 09:00",
-            Lunes: { materia: "quimica2ITA", profesor: "katherine" },
-            Martes: { materia: "filosofia2ITA", profesor: "muniz" },
-            Miercoles: { materia: "lengua2ITA", profesor: "elsa" },
-            Jueves: { materia: "quimica2ITA", profesor: "katherine" },
-            Viernes: { materia: "religion2ITA", profesor: "risco" }
+            Lunes: { materia: "quimica", profesor: "katherine" },
+            Martes: { materia: "filosofia", profesor: "muniz" },
+            Miercoles: { materia: "lengua", profesor: "elsa" },
+            Jueves: { materia: "quimica", profesor: "katherine" },
+            Viernes: { materia: "religion", profesor: "risco" }
         },
         {
             tipo: "clase",
             hora: "09:00 - 09:40",
-            Lunes: { materia: "filosofia2ITA", profesor: "muniz" },
-            Martes: { materia: "fisica2ITA", profesor: "alan" },
-            Miercoles: { materia: "sistemas2ITA", profesor: "coronel" },
-            Jueves: { materia: "religion2ITA", profesor: "risco" },
-            Viernes: { materia: "fisica2ITA", profesor: "alan" }
+            Lunes: { materia: "filosofia", profesor: "muniz" },
+            Martes: { materia: "fisica", profesor: "alan" },
+            Miercoles: { materia: "sistemas", profesor: "coronel" },
+            Jueves: { materia: "religion", profesor: "risco" },
+            Viernes: { materia: "fisica", profesor: "alan" }
         },
         {
             tipo: "recreo",
@@ -44,67 +44,67 @@ const horariosDB = {
         {
             tipo: "clase",
             hora: "10:20 - 11:00",
-            Lunes: { materia: "lengua2ITA", profesor: "elsa" },
-            Martes: { materia: "emprendimiento2ITA", profesor: "ayala" },
-            Miercoles: { materia: "diseno2ITA", profesor: "hugo" },
-            Jueves: { materia: "programacion2ITA", profesor: "tapia" },
-            Viernes: { materia: "emprendimiento2ITA", profesor: "ayala" }
+            Lunes: { materia: "lengua", profesor: "elsa" },
+            Martes: { materia: "emprendimiento", profesor: "ayala" },
+            Miercoles: { materia: "diseno", profesor: "hugo" },
+            Jueves: { materia: "programacion", profesor: "tapia" },
+            Viernes: { materia: "emprendimiento", profesor: "ayala" }
         },
         {
             tipo: "clase",
             hora: "11:00 - 11:40",
-            Lunes: { materia: "lengua2ITA", profesor: "elsa" },
-            Martes: { materia: "civica2ITA", profesor: "muniz" },
-            Miercoles: { materia: "eca2ITA", profesor: "michalon" },
-            Jueves: { materia: "programacion2ITA", profesor: "tapia" },
-            Viernes: { materia: "efisica2ITA", profesor: "corozo" }
+            Lunes: { materia: "lengua", profesor: "elsa" },
+            Martes: { materia: "civica", profesor: "muniz" },
+            Miercoles: { materia: "eca", profesor: "michalon" },
+            Jueves: { materia: "programacion", profesor: "tapia" },
+            Viernes: { materia: "efisica", profesor: "corozo" }
         },
         {
             tipo: "clase",
             hora: "11:40 - 12:20",
             Lunes: { materia: "ingles2ITA", profesor: "fabrizzio" },
             Martes: { materia: "ingles2ITA", profesor: "fabrizzio" },
-            Miercoles: { materia: "historia2ITA", profesor: "ponce" },
-            Jueves: { materia: "sistemas2ITA", profesor: "coronel" },
-            Viernes: { materia: "efisica2ITA", profesor: "corozo" }
+            Miercoles: { materia: "historia", profesor: "ponce" },
+            Jueves: { materia: "sistemas", profesor: "coronel" },
+            Viernes: { materia: "efisica", profesor: "corozo" }
         },
         {
             tipo: "clase",
             hora: "12:20 - 13:00",
             Lunes: { materia: "ingles2ITA", profesor: "fabrizzio" },
-            Martes: { materia: "matematicas2ITA", profesor: "moyano" },
-            Miercoles: { materia: "soporte2ITA", profesor: "villamar" },
-            Jueves: { materia: "biologia2ITA", profesor: "valdires" },
-            Viernes: { materia: "sistemas2ITA", profesor: "coronel" }
+            Martes: { materia: "matematicas", profesor: "moyano" },
+            Miercoles: { materia: "soporte", profesor: "villamar" },
+            Jueves: { materia: "biologia", profesor: "valdires" },
+            Viernes: { materia: "sistemas", profesor: "coronel" }
         },
         {
             tipo: "clase",
             hora: "13:00 - 13:40",
-            Lunes: { materia: "animacion2ITA", profesor: "quijije" },
-            Martes: { materia: "robotica2ITA", profesor: "hugo" },
-            Miercoles: { materia: "biologia2ITA", profesor: "valdires" },
-            Jueves: { materia: "historia2ITA", profesor: "ponce" },
-            Viernes: { materia: "diseno2ITA", profesor: "hugo" }
+            Lunes: { materia: "animacion", profesor: "quijije" },
+            Martes: { materia: "robotica", profesor: "hugo" },
+            Miercoles: { materia: "biologia", profesor: "valdires" },
+            Jueves: { materia: "historia", profesor: "ponce" },
+            Viernes: { materia: "diseno", profesor: "hugo" }
         },
     ],
     "2CNB": [
         {
             tipo: "clase",
             hora: "07:00 - 07:40",
-            Lunes: { materia: "fisica2CNB", profesor: "alan" },
-            Martes: { materia: "quimica2CNB", profesor: "oscar" },
-            Miercoles: { materia: "lengua2CNB", profesor: "elsa" },
-            Jueves: { materia: "tutoria2CNB", profesor: "ayala" },
-            Viernes: { materia: "matematicas2CNB", profesor: "moyano" }
+            Lunes: { materia: "fisica", profesor: "alan" },
+            Martes: { materia: "quimica", profesor: "oscar" },
+            Miercoles: { materia: "lengua", profesor: "elsa" },
+            Jueves: { materia: "tutoria", profesor: "ayala" },
+            Viernes: { materia: "matematicas", profesor: "moyano" }
         },
         {
             tipo: "clase",
             hora: "07:40 - 08:20",
-            Lunes: { materia: "biologia2CNB", profesor: "valdires" },
-            Martes: { materia: "animacion2CNB", profesor: "quijije" },
-            Miercoles: { materia: "lengua2CNB", profesor: "elsa" },
-            Jueves: { materia: "religion2CNB", profesor: "risco" },
-            Viernes: { materia: "matematicas2CNB", profesor: "moyano" }
+            Lunes: { materia: "biologia", profesor: "valdires" },
+            Martes: { materia: "animacion", profesor: "quijije" },
+            Miercoles: { materia: "lengua", profesor: "elsa" },
+            Jueves: { materia: "religion", profesor: "risco" },
+            Viernes: { materia: "matematicas", profesor: "moyano" }
         },
         {
             tipo: "clase",
@@ -112,17 +112,17 @@ const horariosDB = {
             Lunes: { materia: "ingles2CNB", profesor: "herbozo" },
             Martes: { materia: "ingles2CNB", profesor: "herbozo" },
             Miercoles: { materia: "ingles2CNB", profesor: "herbozo" },
-            Jueves: { materia: "efisica2CNB", profesor: "corozo" },
-            Viernes: { materia: "quimica2CNB", profesor: "oscar" }
+            Jueves: { materia: "efisica", profesor: "corozo" },
+            Viernes: { materia: "quimica", profesor: "oscar" }
         },
         {
             tipo: "clase",
             hora: "09:00 - 09:40",
             Lunes: { materia: "ingles2CNB", profesor: "herbozo" },
             Martes: { materia: "ingles2CNB", profesor: "herbozo" },
-            Miercoles: { materia: "fisica2CNB", profesor: "alan" },
-            Jueves: { materia: "efisica2CNB", profesor: "corozo" },
-            Viernes: { materia: "quimica2CNB", profesor: "oscar" }
+            Miercoles: { materia: "fisica", profesor: "alan" },
+            Jueves: { materia: "efisica", profesor: "corozo" },
+            Viernes: { materia: "quimica", profesor: "oscar" }
         },
         {
             tipo: "recreo",
@@ -132,38 +132,38 @@ const horariosDB = {
         {
             tipo: "clase",
             hora: "10:20 - 11:00",
-            Lunes: { materia: "eca2CNB", profesor: "michalon" },
-            Martes: { materia: "fisica2CNB", profesor: "alan" },
-            Miercoles: { materia: "historia2CNB", profesor: "ponce" },
+            Lunes: { materia: "eca", profesor: "michalon" },
+            Martes: { materia: "fisica", profesor: "alan" },
+            Miercoles: { materia: "historia", profesor: "ponce" },
             Jueves: { materia: "classroom2CNB", profesor: "herbozo" },
-            Viernes: { materia: "ciudadania2CNB", profesor: "betty" }
+            Viernes: { materia: "ciudadania", profesor: "betty" }
         },
         {
             tipo: "clase",
             hora: "11:00 - 11:40",
-            Lunes: { materia: "ciudadania2CNB", profesor: "betty" },
-            Martes: { materia: "matematicas2CNB", profesor: "moyano" },
-            Miercoles: { materia: "emprendimiento2CNB", profesor: "ayala" },
+            Lunes: { materia: "ciudadania", profesor: "betty" },
+            Martes: { materia: "matematicas", profesor: "moyano" },
+            Miercoles: { materia: "emprendimiento", profesor: "ayala" },
             Jueves: { materia: "classroom2CNB", profesor: "herbozo" },
-            Viernes: { materia: "filosofia2CNB", profesor: "muniz" }
+            Viernes: { materia: "filosofia", profesor: "muniz" }
         },
         {
             tipo: "clase",
             hora: "11:40 - 12:20",
-            Lunes: { materia: "filosofia2CNB", profesor: "muniz" },
-            Martes: { materia: "matematicas2CNB", profesor: "moyano" },
-            Miercoles: { materia: "robotica2CNB", profesor: "hugo"},
-            Jueves: { materia: "civica2CNB", profesor: "ayala" },
-            Viernes: { materia: "lengua2CNB", profesor: "elsa" }
+            Lunes: { materia: "filosofia", profesor: "muniz" },
+            Martes: { materia: "matematicas", profesor: "moyano" },
+            Miercoles: { materia: "robotica", profesor: "hugo"},
+            Jueves: { materia: "civica", profesor: "ayala" },
+            Viernes: { materia: "lengua", profesor: "elsa" }
         },
         {
             tipo: "clase",
             hora: "12:20 - 13:00",
-            Lunes: { materia: "emprendimiento2CNB", profesor: "ayala" },
-            Martes: { materia: "biologia2CNB", profesor: "valdires" },
-            Miercoles: { materia: "religion2CNB", profesor: "risco" },
-            Jueves: { materia: "historia2CNB", profesor: "ponce" },
-            Viernes: { materia: "lengua2CNB", profesor: "elsa" }
+            Lunes: { materia: "emprendimiento", profesor: "ayala" },
+            Martes: { materia: "biologia", profesor: "valdires" },
+            Miercoles: { materia: "religion", profesor: "risco" },
+            Jueves: { materia: "historia", profesor: "ponce" },
+            Viernes: { materia: "lengua", profesor: "elsa" }
         },
     ]
 };
