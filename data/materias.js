@@ -21,7 +21,7 @@ const materiasDB = [
         nombre: "Classroom Community for Speaking",
         niveles: [
             { id: "advanced", nombre: "Advanced", profesor: "herbozo" },
-            { id: "intermediate", nombre: "Intermediate", profesor: "" },
+            { id: "intermediate", nombre: "Intermediate", profesor: "nunez" },
             { id: "basic", nombre: "Basic", profesor: "" }
         ]
     },

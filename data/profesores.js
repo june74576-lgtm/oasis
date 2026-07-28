@@ -110,5 +110,10 @@ const profesoresDB = [
         id: "herrera",
         nombre: "Daniela Betzaida Herrera Manzano",
         foto: "fotos_profesores/herreradaniela.jpg"
-    }
+    },
+    {
+        id: "nunez",
+        nombre: "Jose Antonio Nuñez Manzano",
+        foto: "fotos_profesores/nunezjose.jpg"
+    },
 ];
