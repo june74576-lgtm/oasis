@@ -4,7 +4,7 @@ const materiasDB = [
         nombre: "Inglés",
         niveles: [
             { id: "advanced", nombre: "Advanced", profesor: "herbozo" },
-            { id: "intermediate", nombre: "Intermediate", profesor: "" },
+            { id: "intermediate", nombre: "Intermediate", profesor: "nunez" },
             { id: "basic", nombre: "Basic", profesor: "" }
         ]
     },
