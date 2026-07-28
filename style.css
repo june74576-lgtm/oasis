@@ -46,7 +46,6 @@ header{
 .topbar{ width:90%; max-width:1100px; margin:auto; padding:16px 0; display:flex; justify-content:space-between; align-items:center; }
 
 .brand-group{ display:flex; align-items:center; gap:8px; }
-.brand-logo{ flex-shrink:0; }
 
 .brand{
     color:var(--primary); letter-spacing:4px; font-weight:700;
@@ -78,8 +77,36 @@ header{
     box-shadow:0 30px 90px rgba(0,0,0,.55);
 }
 
-.logomark{ width:56px; margin:0 auto 22px; }
-.app-card h1{ font-size:38px; font-variation-settings:"wght" 700; letter-spacing:1px; }
+.logomark{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.logomark img{
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    display: block;
+
+    /* Evita que se seleccione o arrastre */
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+
+    -webkit-user-drag: none;
+    user-drag: none;
+
+    pointer-events: none;
+}
+
+.app-card h1{
+    font-family:"Raleway", sans-serif;
+    font-weight:300;
+    letter-spacing:10px;
+}
 .tagline{ margin-top:8px; color:var(--on-surface-var); font-size:14px; }
 
 /* ===== Carrusel ===== */

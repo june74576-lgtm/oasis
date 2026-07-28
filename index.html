@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oasis</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
-
+    <link rel="icon" type="image/png" href="logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,300..800&family=Anton&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Pacifico&family=Roboto+Flex:opsz,wght@8..144,300..800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400&display=swap" rel="stylesheet">
 
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -22,22 +22,6 @@
 <header>
     <div class="topbar">
         <div class="brand-group">
-            <svg class="brand-logo" width="20" height="20" viewBox="0 0 56 56" fill="none" aria-hidden="true">
-                <g transform="translate(28,28)" stroke="url(#roseGradSmall)" stroke-width="3" stroke-linejoin="round" fill="none">
-                    <path d="M0,-3 C4,-9 4,-17 0,-21 C-4,-17 -4,-9 0,-3 Z" transform="rotate(0)"/>
-                    <path d="M0,-3 C4,-9 4,-17 0,-21 C-4,-17 -4,-9 0,-3 Z" transform="rotate(72)"/>
-                    <path d="M0,-3 C4,-9 4,-17 0,-21 C-4,-17 -4,-9 0,-3 Z" transform="rotate(144)"/>
-                    <path d="M0,-3 C4,-9 4,-17 0,-21 C-4,-17 -4,-9 0,-3 Z" transform="rotate(216)"/>
-                    <path d="M0,-3 C4,-9 4,-17 0,-21 C-4,-17 -4,-9 0,-3 Z" transform="rotate(288)"/>
-                    <circle r="4.5" fill="url(#roseGradSmall)" stroke="none"/>
-                </g>
-                <defs>
-                    <linearGradient id="roseGradSmall" x1="0" y1="0" x2="56" y2="56">
-                        <stop offset="0" style="stop-color:#c6b8ff"/>
-                        <stop offset="1" style="stop-color:#f0b7d0"/>
-                    </linearGradient>
-                </defs>
-            </svg>
             <span class="brand">OASIS</span>
         </div>
 
@@ -71,30 +55,11 @@
     <div class="glow glow-2"></div>
 
     <div class="app-card">
-        <div class="logomark" aria-hidden="true">
-            <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
-                <g transform="translate(28,28)" stroke="url(#roseGrad)" stroke-width="2.4" stroke-linejoin="round" fill="none">
-                    <path d="M0,-3 C4,-9 4,-17 0,-21 C-4,-17 -4,-9 0,-3 Z" transform="rotate(0)"/>
-                    <path d="M0,-3 C4,-9 4,-17 0,-21 C-4,-17 -4,-9 0,-3 Z" transform="rotate(72)"/>
-                    <path d="M0,-3 C4,-9 4,-17 0,-21 C-4,-17 -4,-9 0,-3 Z" transform="rotate(144)"/>
-                    <path d="M0,-3 C4,-9 4,-17 0,-21 C-4,-17 -4,-9 0,-3 Z" transform="rotate(216)"/>
-                    <path d="M0,-3 C4,-9 4,-17 0,-21 C-4,-17 -4,-9 0,-3 Z" transform="rotate(288)"/>
-                    <circle r="4.5" fill="url(#roseGradCenter)" stroke="none"/>
-                </g>
-                <defs>
-                    <linearGradient id="roseGrad" x1="0" y1="0" x2="56" y2="56">
-                        <stop offset="0" style="stop-color:#c6b8ff"/>
-                        <stop offset="1" style="stop-color:#f0b7d0"/>
-                    </linearGradient>
-                    <linearGradient id="roseGradCenter" x1="0" y1="0" x2="56" y2="56">
-                        <stop offset="0" style="stop-color:#f0b7d0"/>
-                        <stop offset="1" style="stop-color:#c6b8ff"/>
-                    </linearGradient>
-                </defs>
-            </svg>
-        </div>
+<div class="logomark">
+    <img src="logo.png" alt="OASIS" draggable="false">
+</div>
         <h1>OASIS</h1>
-        <p class="tagline">Segundo Bachillerato · Portal de clase</p>
+        <p class="tagline">Segundo Bachillerato · Cursos</p>
     </div>
 </section>
 
@@ -114,7 +79,7 @@
 <section class="about" id="about">
     <h2>¿ENCONTRASTE ALGÚN ERROR?</h2>
     <div class="divider-pill"></div>
-    <p>Escríbeme al WhatsApp si hay algún error en alguna fecha, nombre o cualquier otro dato. O si quieres añadir tu curso. ^^</p>
+    <p>¿Encontraste algún error o falta información? Escríbeme por WhatsApp y lo corregiré lo antes posible. Si quieres que tu curso forme parte de OASIS, también puedes contactarme. ^^</p>
     <button class="phone-chip" id="phoneChip" type="button" aria-label="Copiar número de teléfono">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 3.5h3l1.5 4-2 1.5a11 11 0 0 0 5 5l1.5-2 4 1.5v3a1.5 1.5 0 0 1-1.6 1.5A16 16 0 0 1 5 6.1 1.5 1.5 0 0 1 6.5 3.5Z"/></svg>
         <span id="phoneChipText">+593 98 027 1168</span>

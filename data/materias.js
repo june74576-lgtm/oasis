@@ -1,5 +1,39 @@
 const materiasDB = [
     {
+        id: "ingles2CNB",
+        nombre: "Inglés",
+        niveles: [
+            { id: "advanced", nombre: "Advanced", profesor: "herbozo" },
+            { id: "intermediate", nombre: "Intermediate", profesor: "" },
+            { id: "basic", nombre: "Basic", profesor: "" }
+        ]
+    },
+    {
+        id: "ingles2ITA",
+        nombre: "Inglés",
+        niveles: [
+            { id: "advanced", nombre: "Advanced", profesor: "fabrizzio" },
+            { id: "basic", nombre: "Basic", profesor: "" }
+        ]
+    },
+    {
+        id: "classroom2CNB",
+        nombre: "Classroom Community for Speaking",
+        niveles: [
+            { id: "advanced", nombre: "Advanced", profesor: "herbozo" },
+            { id: "intermediate", nombre: "Intermediate", profesor: "" },
+            { id: "basic", nombre: "Basic", profesor: "" }
+        ]
+    },
+    {
+        id: "classroom2ITA",
+        nombre: "Classroom Community for Speaking",
+        niveles: [
+            { id: "advanced", nombre: "Advanced", profesor: "garaicoa" },
+            { id: "basic", nombre: "Basic", profesor: "herrera" }
+        ]
+    },
+    {
         id: "matematicas",
         nombre: "Matemáticas"
     },
@@ -14,32 +48,6 @@ const materiasDB = [
     {
         id: "lengua",
         nombre: "Lengua y Literatura"
-    },
-    {
-        id: "ingles2ITA",
-        nombre: "Inglés",
-        niveles: [
-            { id: "advanced", nombre: "Advanced", profesor: "fabrizzio" },
-            { id: "basic", nombre: "Basic", profesor: "" }
-        ]
-    },
-    {
-        id: "ingles2CNB",
-        nombre: "Inglés",
-        niveles: [
-            { id: "advanced", nombre: "Advanced", profesor: "herbozo" },
-            { id: "intermediate", nombre: "Intermediate", profesor: "" },
-            { id: "basic", nombre: "Basic", profesor: "" }
-        ]
-    },
-    {
-        id: "classroom2CNB",
-        nombre: "Classroom Community for Speaking",
-        niveles: [
-            { id: "advanced", nombre: "Advanced", profesor: "" },
-            { id: "intermediate", nombre: "Intermediate", profesor: "" },
-            { id: "basic", nombre: "Basic", profesor: "" }
-        ]
     },
     {
         id: "animacion",
@@ -96,14 +104,6 @@ const materiasDB = [
     {
         id: "biologia",
         nombre: "Biología"
-    },
-    {
-        id: "classroom2ITA",
-        nombre: "Classroom Community for Speaking",
-        niveles: [
-            { id: "advanced", nombre: "Advanced", profesor: "garaicoa" },
-            { id: "basic", nombre: "Basic", profesor: "" }
-        ]
     },
     {
         id: "religion",

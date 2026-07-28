@@ -43,7 +43,7 @@ const estudiantesDB = [
         curso: "2ITA",
         fechaNacimiento: "2010-01-30",
         nivelIngles: "Basic (B1+)",
-        cargo: ""
+        cargo: "Vocal de Vida y Comunidad"
     },
     {
         id: 6,
@@ -61,7 +61,7 @@ const estudiantesDB = [
         curso: "2ITA",
         fechaNacimiento: "2010-10-07",
         nivelIngles: "Advanced (B2)",
-        cargo: ""
+        cargo: "Vocal de Comportamiento"
     },
     {
         id: 8,

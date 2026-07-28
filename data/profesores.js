@@ -105,5 +105,10 @@ const profesoresDB = [
         id: "herbozo",
         nombre: "Jorge Michael Herbozo Gamboa",
         foto: "fotos_profesores/herbozomichael.jpg"
+    },
+    {
+        id: "herrera",
+        nombre: "Daniela Betzaida Herrera Manzano",
+        foto: "fotos_profesores/herreradaniela.jpg"
     }
 ];
