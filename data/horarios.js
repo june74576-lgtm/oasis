@@ -159,7 +159,7 @@ const horariosDB = {
         {
             tipo: "clase",
             hora: "12:20 - 13:00",
-            Lunes: { materia: "ingles2ITB", profesor: "fabrizzio" },
+            Lunes: { materia: "ingles2ITA", profesor: "fabrizzio" },
             Martes: { materia: "programacion", profesor: "tapia" },
             Miercoles: { materia: "filosofia", profesor: "muniz" },
             Jueves: { materia: "matematicas", profesor: "moyano" },
