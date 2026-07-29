@@ -2,7 +2,8 @@ const profesoresDB = [
     {
         id: "moyano",
         nombre: "Giovanny Ivan Moyano Llorenty",
-        foto: "fotos_profesores/moyanogiovanny.jpg"
+        foto: "fotos_profesores/moyanogiovanny.jpg",
+        tutor: "2ITB"
     },
     {
         id: "katherine",

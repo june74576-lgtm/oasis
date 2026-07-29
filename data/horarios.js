@@ -87,6 +87,95 @@ const horariosDB = {
             Viernes: { materia: "diseno", profesor: "hugo" }
         },
     ],
+    "2ITB": [
+        {
+            tipo: "clase",
+            hora: "07:00 - 07:40",
+            Lunes: { materia: "religion", profesor: "risco" },
+            Martes: { materia: "quimica", profesor: "katherine" },
+            Miercoles: { materia: "tutoria", profesor: "moyano" }, // o "tutoria - misa"
+            Jueves: { materia: "classroom2ITA", profesor: "herrera" },
+            Viernes: { materia: "historia", profesor: "ponce" }
+        },
+        {
+            tipo: "clase",
+            hora: "07:40 - 08:20",
+            Lunes: { materia: "animacion", profesor: "quijije" },
+            Martes: { materia: "civica", profesor: "moyano" }, // Acompañamiento en el aula / Cívica
+            Miercoles: { materia: "diseno", profesor: "hugo" },
+            Jueves: { materia: "classroom2ITA", profesor: "herrera" },
+            Viernes: { materia: "lengua", profesor: "elsa" }
+        },
+        {
+            tipo: "clase",
+            hora: "08:20 - 09:00",
+            Lunes: { materia: "matematicas", profesor: "moyano" },
+            Martes: { materia: "emprendimiento", profesor: "ayala" },
+            Miercoles: { materia: "sistemas", profesor: "coronel" },
+            Jueves: { materia: "historia", profesor: "ponce" },
+            Viernes: { materia: "emprendimiento", profesor: "ayala" }
+        },
+        {
+            tipo: "clase",
+            hora: "09:00 - 09:40",
+            Lunes: { materia: "matematicas", profesor: "moyano" },
+            Martes: { materia: "sistemas", profesor: "coronel" },
+            Miercoles: { materia: "biologia", profesor: "valdires" },
+            Jueves: { materia: "diseno", profesor: "hugo" },
+            Viernes: { materia: "emprendimiento", profesor: "ayala" }
+        },
+        {
+            tipo: "recreo",
+            hora: "09:40 - 10:20",
+            label: "Recreo"
+        },
+        {
+            tipo: "clase",
+            hora: "10:20 - 11:00",
+            Lunes: { materia: "fisica", profesor: "oscar" },
+            Martes: { materia: "efisica", profesor: "corozo" },
+            Miercoles: { materia: "programacion", profesor: "tapia" },
+            Jueves: { materia: "religion", profesor: "risco" },
+            Viernes: { materia: "filosofia", profesor: "muniz" }
+        },
+        {
+            tipo: "clase",
+            hora: "11:00 - 11:40",
+            Lunes: { materia: "soporte", profesor: "villamar" },
+            Martes: { materia: "programacion", profesor: "tapia" },
+            Miercoles: { materia: "soporte", profesor: "villamar" },
+            Jueves: { materia: "ciudadania", profesor: "betty" },
+            Viernes: { materia: "sistemas", profesor: "coronel" }
+        },
+        {
+            tipo: "clase",
+            hora: "11:40 - 12:20",
+            Lunes: { materia: "ingles2ITA", profesor: "fabrizzio" },
+            Martes: { materia: "ingles2ITA", profesor: "fabrizzio" },
+            Miercoles: { materia: "lengua", profesor: "elsa" },
+            Jueves: { materia: "quimica", profesor: "katherine" },
+            Viernes: { materia: "biologia", profesor: "valdires" }
+        },
+        {
+            tipo: "clase",
+            hora: "12:20 - 13:00",
+            Lunes: { materia: "ingles2ITB", profesor: "fabrizzio" },
+            Martes: { materia: "programacion", profesor: "tapia" },
+            Miercoles: { materia: "filosofia", profesor: "muniz" },
+            Jueves: { materia: "matematicas", profesor: "moyano" },
+            Viernes: { materia: "robotica", profesor: "hugo" }
+        },
+        {
+            tipo: "clase",
+            hora: "13:00 - 13:40",
+            Lunes: { materia: "eca", profesor: "michalon" },
+            Martes: { materia: "programacion", profesor: "tapia" },
+            Miercoles: { materia: "fisica", profesor: "oscar" },
+            Jueves: { materia: "robotica", profesor: "hugo" },
+            Viernes: { materia: "ciudadania", profesor: "betty" }
+        }
+    ],
+
     "2CNB": [
         {
             tipo: "clase",

@@ -118,12 +118,20 @@
             <div class="horario-wrapper">
                 <table class="horario" id="horarioTable">
                     <thead>
-                        <tr><th>Hora</th><th>Lunes</th><th>Martes</th><th>Miércoles</th><th>Jueves</th><th>Viernes</th></tr>
+                        <tr>
+                            <th>Hora</th>
+                            <th class="day-header-clickable" data-day="Lunes">Lunes</th>
+                            <th class="day-header-clickable" data-day="Martes">Martes</th>
+                            <th class="day-header-clickable" data-day="Miercoles">Miércoles</th>
+                            <th class="day-header-clickable" data-day="Jueves">Jueves</th>
+                            <th class="day-header-clickable" data-day="Viernes">Viernes</th>
+                        </tr>
                     </thead>
                     <tbody id="horarioBody"></tbody>
                 </table>
                 <div class="horario-mobile" id="horarioMobile">
                     <div class="day-tabs" id="dayTabs"></div>
+                    <button class="tareas-btn" id="tareasBtn" type="button">Ver tareas</button>
                     <div class="day-track" id="dayTrack"></div>
                 </div>
             </div>
@@ -170,6 +178,11 @@
             <div class="no-photo mini-photo" id="studentPhotoFallback" style="display:none;">No Photo</div>
         </div>
         <h3 id="studentModalName"></h3>
+
+        <div class="student-role" id="studentModalRole" style="display:none;">
+            <span id="studentModalRoleText"></span>
+        </div>
+
         <div class="mini-details">
             <p><span>Nacimiento</span><strong id="studentModalBirth">-</strong></p>
             <p><span>Nivel de inglés</span><strong id="studentModalIngles">-</strong></p>
@@ -222,12 +235,39 @@
         </div>
     </div>
 </div>
+<!-- Modal: tareas -->
+<div class="mini-overlay" id="tareasModalOverlay">
+    <div class="mini-modal">
+        <button class="modal-close" id="tareasModalClose" aria-label="Cerrar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+        <h3 id="tareasModalTitulo">Tareas</h3>
+        <div class="divider-pill"></div>
 
+        <div class="tareas-list" id="tareasList"></div>
+
+        <button class="btn-filled small" id="addTareaToggle" style="display:none; margin-top:18px;">+ Agregar tarea</button>
+        <p class="login-hint" id="tareaLoginHint">Inicia sesión para agregar tareas.</p>
+
+        <div class="add-tarea-form" id="addTareaForm">
+            <select id="tareaMateria"></select>
+            <input type="text" id="tareaTitulo" placeholder="Título de la tarea" maxlength="80">
+            <textarea id="tareaDescripcion" placeholder="Descripción (opcional)" rows="3"></textarea>
+            <button id="tareaSubmitBtn" class="btn-filled">Guardar tarea</button>
+        </div>
+    </div>
+</div>
+
+<div class="image-viewer" id="imageViewer">
+    <button class="image-viewer-close" id="imageViewerClose" aria-label="Cerrar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 6l12 12M18 6 6 18"/>
+        </svg>
+    </button>
+
+    <img id="imageViewerImg" src="" alt="">
+</div>
 <!-- Datos locales -->
-<!-- IMPORTANTE: cada vez que edites uno de estos archivos, subile 1 al
-     numero de ?v= correspondiente (ej. ?v=1 -> ?v=2). Así el navegador
-     sabe que cambio y lo vuelve a descargar en vez de usar el que tenia
-     guardado en cache. -->
 <script src="data/cursos.js?v=4"></script>
 <script src="data/profesores.js?v=3"></script>
 <script src="data/materias.js?v=4"></script>

@@ -76,6 +76,8 @@ const studentModalName = document.getElementById("studentModalName");
 const studentModalBirth = document.getElementById("studentModalBirth");
 const studentModalIngles = document.getElementById("studentModalIngles");
 const studentModalContrib = document.getElementById("studentModalContrib");
+const studentModalRole = document.getElementById("studentModalRole");
+const studentModalRoleText = document.getElementById("studentModalRoleText");
 
 const materiaModalOverlay = document.getElementById("materiaModalOverlay");
 const materiaModalClose = document.getElementById("materiaModalClose");
@@ -103,6 +105,7 @@ const loginUsername = document.getElementById("loginUsername");
 const loginPassword = document.getElementById("loginPassword");
 const loginError = document.getElementById("loginError");
 const loginSubmitBtn = document.getElementById("loginSubmitBtn");
+
 
 /* ===== UTILIDADES ===== */
 
@@ -394,7 +397,8 @@ fsClose.addEventListener("click", closeCourseFullscreen);
 
 document.addEventListener("keydown", e => {
     if (e.key !== "Escape") return;
-    if (materiaModalOverlay.classList.contains("active")) closeMateriaModal();
+    if (imageViewer.classList.contains("active")) closeImageViewer();
+    else if (materiaModalOverlay.classList.contains("active")) closeMateriaModal();
     else if (studentModalOverlay.classList.contains("active")) closeStudentModal();
     else if (loginModalOverlay.classList.contains("active")) closeLoginModal();
     else if (courseFullscreen.classList.contains("active")) closeCourseFullscreen();
@@ -427,7 +431,16 @@ function renderTutor(courseId) {
 
     const photoWrap = document.createElement("div");
     photoWrap.classList.add("tutor-photo-wrap");
-    photoWrap.appendChild(buildPhotoSlot(tutor.foto, tutor.nombre));
+    
+    const photoSlot = buildPhotoSlot(tutor.foto, tutor.nombre);
+    photoWrap.appendChild(photoSlot);
+    
+    const tutorImg = photoSlot.querySelector("img");
+    if (tutorImg) {
+        tutorImg.addEventListener("click", () => openImageViewer(tutor.foto));
+        tutorImg.style.cursor = "zoom-in";
+    }
+    
     tutorCard.appendChild(photoWrap);
 
     const name = document.createElement("span");
@@ -529,7 +542,9 @@ function renderHorarioMobile(rows) {
         tab.classList.add("day-tab");
         if (dayIdx === 0) tab.classList.add("active");
         tab.textContent = day.slice(0, 3);
-        tab.addEventListener("click", () => showDay(dayIdx));
+        tab.addEventListener("click", () => {
+            showDay(dayIdx);
+        });
         dayTabs.appendChild(tab);
 
         const panel = document.createElement("div");
@@ -650,6 +665,207 @@ function showDay(idx) {
     document.querySelectorAll(".day-panel").forEach((p, i) => p.classList.toggle("active", i === idx));
 }
 
+// Clic en un día abre las Tareas de ese día — encabezados de la tabla
+// (escritorio) y el botón "Ver tareas" (móvil, tarea del día activo).
+document.querySelectorAll(".day-header-clickable").forEach(th => {
+    th.addEventListener("click", () => openTareasModal(th.dataset.day));
+});
+
+if (tareasBtn) {
+    tareasBtn.addEventListener("click", () => {
+        const activeIdx = Array.from(document.querySelectorAll(".day-tab")).findIndex(t => t.classList.contains("active"));
+        openTareasModal(days[activeIdx === -1 ? 0 : activeIdx]);
+    });
+}
+
+
+/* ===== TAREAS ===== */
+
+let currentTareaDia = null;
+
+function puedeAgregarTareaAqui() {
+    if (!currentUser || !supabaseListo() || !currentCourse) return false;
+    const yo = (typeof estudiantesDB !== "undefined" ? estudiantesDB : []).find(e => e.id === currentUser.id);
+    return !!(yo && yo.curso === currentCourse);
+}
+
+// Materias que ese curso tiene ese día (para el selector del formulario
+// y para saber qué secciones mostrar aunque todavía no tengan tareas).
+function materiasDelDia(courseId, dia) {
+    const dbAll = typeof horariosDB !== "undefined" ? horariosDB : {};
+    const rows = dbAll[courseId] || [];
+    const ids = [];
+    rows.forEach(row => {
+        if (row.tipo !== "clase") return;
+        const cell = row[dia];
+        if (cell && !ids.includes(cell.materia)) ids.push(cell.materia);
+    });
+    return ids;
+}
+
+function openTareasModal(dia) {
+    currentTareaDia = dia;
+    tareasModalTitulo.textContent = "Tareas · " + dia;
+    addTareaForm.classList.remove("open");
+
+    if (puedeAgregarTareaAqui()) {
+        addTareaToggle.style.display = "inline-flex";
+        tareaLoginHint.style.display = "none";
+        renderTareaMateriaOptions(dia);
+    } else {
+        addTareaToggle.style.display = "none";
+        tareaLoginHint.style.display = "block";
+        tareaLoginHint.textContent = !currentUser
+            ? "Inicia sesión para agregar tareas."
+            : "Solo los estudiantes de este curso pueden agregar tareas aquí.";
+    }
+
+    loadTareas(currentCourse, dia);
+
+    tareasModalOverlay.classList.add("active");
+    lockScroll();
+}
+
+function closeTareasModal() {
+    tareasModalOverlay.classList.remove("active");
+    unlockScroll();
+}
+
+tareasModalClose.addEventListener("click", closeTareasModal);
+tareasModalOverlay.addEventListener("click", e => { if (e.target === tareasModalOverlay) closeTareasModal(); });
+
+function renderTareaMateriaOptions(dia) {
+    const ids = materiasDelDia(currentCourse, dia);
+    tareaMateria.innerHTML = "";
+    ids.forEach(id => {
+        const opt = document.createElement("option");
+        opt.value = id;
+        opt.textContent = materiaNombre(id);
+        tareaMateria.appendChild(opt);
+    });
+}
+
+addTareaToggle.addEventListener("click", () => addTareaForm.classList.toggle("open"));
+
+async function loadTareas(courseId, dia) {
+    tareasList.innerHTML = `<p class="tareas-empty">Cargando...</p>`;
+
+    const materiaIds = materiasDelDia(courseId, dia);
+
+    if (materiaIds.length === 0) {
+        tareasList.innerHTML = `<p class="tareas-empty">No hay materias registradas ese día.</p>`;
+        return;
+    }
+
+    let tareas = [];
+    if (supabaseListo()) {
+        try {
+            const { data, error } = await supabaseClient
+                .from("tareas")
+                .select("*")
+                .eq("curso", courseId)
+                .eq("dia", dia);
+            if (error) throw error;
+            tareas = data || [];
+        } catch (err) {
+            console.error(err);
+            tareasList.innerHTML = `<p class="tareas-empty">Error al cargar las tareas.</p>`;
+            return;
+        }
+    }
+
+    renderTareas(materiaIds, tareas);
+}
+
+function renderTareas(materiaIds, tareas) {
+    tareasList.innerHTML = "";
+
+    materiaIds.forEach(materiaId => {
+        const group = document.createElement("div");
+        group.classList.add("tareas-materia-group");
+
+        const titulo = document.createElement("div");
+        titulo.classList.add("tareas-materia-titulo");
+        titulo.textContent = materiaNombre(materiaId);
+        group.appendChild(titulo);
+
+        const propias = tareas.filter(t => t.materia === materiaId);
+
+        if (propias.length === 0) {
+            const vacio = document.createElement("p");
+            vacio.classList.add("tareas-materia-empty");
+            vacio.textContent = "Sin tareas todavía";
+            group.appendChild(vacio);
+        } else {
+            propias.forEach(t => group.appendChild(buildTareaItem(t)));
+        }
+
+        tareasList.appendChild(group);
+    });
+}
+
+function buildTareaItem(t) {
+    const item = document.createElement("div");
+    item.classList.add("tarea-item");
+
+    const header = document.createElement("button");
+    header.classList.add("tarea-item-header");
+    header.type = "button";
+    header.innerHTML = `
+        <span>
+            <span class="tarea-item-titulo">${t.titulo}</span>
+            <div class="tarea-item-autor">Por ${t.autor_nombre || "alguien"}</div>
+        </span>
+        <svg class="tarea-item-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+    `;
+    header.addEventListener("click", () => item.classList.toggle("open"));
+    item.appendChild(header);
+
+    const descWrap = document.createElement("div");
+    descWrap.classList.add("tarea-desc-wrap");
+    descWrap.innerHTML = `<div class="tarea-desc-inner"><p>${t.descripcion ? t.descripcion : "Sin descripción."}</p></div>`;
+    item.appendChild(descWrap);
+
+    return item;
+}
+
+tareaSubmitBtn.addEventListener("click", async () => {
+    if (!puedeAgregarTareaAqui() || !currentTareaDia) return;
+
+    const materia = tareaMateria.value;
+    const titulo = tareaTitulo.value.trim();
+    const descripcion = tareaDescripcion.value.trim();
+    if (!materia || !titulo) return;
+
+    tareaSubmitBtn.disabled = true;
+    tareaSubmitBtn.textContent = "Guardando...";
+
+    try {
+        const { error } = await supabaseClient.from("tareas").insert({
+            curso: currentCourse,
+            dia: currentTareaDia,
+            materia,
+            titulo,
+            descripcion,
+            autor_id: currentUser.id,
+            autor_nombre: currentUser.nombre,
+            fecha: new Date().toISOString()
+        });
+        if (error) throw error;
+
+        tareaTitulo.value = "";
+        tareaDescripcion.value = "";
+        addTareaForm.classList.remove("open");
+        await loadTareas(currentCourse, currentTareaDia);
+    } catch (err) {
+        console.error(err);
+        alert("No se pudo guardar la tarea. Revisa la consola (F12).");
+    } finally {
+        tareaSubmitBtn.disabled = false;
+        tareaSubmitBtn.textContent = "Guardar tarea";
+    }
+});
+
 
 /* ===== MODAL MATERIA ===== */
 
@@ -660,6 +876,8 @@ function setProfPhoto(url) {
             profPhotoFallback.style.display = "flex";
         };
         materiaModalProfFoto.src = url;
+        materiaModalProfFoto.style.cursor = "zoom-in";
+        materiaModalProfFoto.onclick = () => openImageViewer(url);
         materiaModalProfFoto.style.display = "block";
         profPhotoFallback.style.display = "none";
     } else {
@@ -789,6 +1007,8 @@ function renderGaleria(courseId) {
         img.src = item.ruta;
         img.alt = "";
         img.loading = "lazy";
+        img.style.cursor = "zoom-in";
+        img.addEventListener("click", () => openImageViewer(item.ruta));
         div.appendChild(img);
         galeriaTrack.appendChild(div);
     });
@@ -924,6 +1144,8 @@ function openStudentModal(s) {
             studentPhotoFallback.style.display = "flex";
         };
         studentModalPhoto.src = s.foto;
+        studentModalPhoto.style.cursor = "zoom-in";
+        studentModalPhoto.onclick = () => openImageViewer(s.foto);
         studentModalPhoto.style.display = "block";
         studentPhotoFallback.style.display = "none";
     } else {
@@ -931,6 +1153,12 @@ function openStudentModal(s) {
         studentPhotoFallback.style.display = "flex";
     }
     studentModalName.textContent = s.nombre;
+    if (s.cargo) {
+        studentModalRole.style.display = "inline-flex";
+        studentModalRoleText.textContent = s.cargo;
+    } else {
+        studentModalRole.style.display = "none";
+    }
     studentModalBirth.textContent = formatFecha(s.fechaNacimiento);
     studentModalIngles.textContent = s.nivelIngles || "-";
     studentModalContrib.textContent = "...";
@@ -985,3 +1213,27 @@ if (phoneChip) {
         }, 1500);
     });
 }
+const imageViewer = document.getElementById("imageViewer");
+const imageViewerImg = document.getElementById("imageViewerImg");
+const imageViewerClose = document.getElementById("imageViewerClose");
+
+function openImageViewer(src){
+    if(!src) return;
+
+    imageViewerImg.src = src;
+
+    imageViewer.classList.add("active");
+    lockScroll();
+}
+
+function closeImageViewer(){
+    imageViewer.classList.remove("active");
+    unlockScroll();
+}
+
+imageViewerClose.addEventListener("click", closeImageViewer);
+
+imageViewer.addEventListener("click", e=>{
+    if(e.target===imageViewer)
+        closeImageViewer();
+});

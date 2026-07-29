@@ -97,7 +97,7 @@ header{
     -moz-user-select: none;
 
     -webkit-user-drag: none;
-    user-drag: none;
+    -user-drag: none;
 
     pointer-events: none;
 }
@@ -346,6 +346,67 @@ table.horario td.libre-cell{ color:var(--on-surface-var); font-style:italic; fon
 
 .day-track{ width:100%; }
 .day-panel{ display:none; padding:0 2px; }
+
+table.horario th.day-header-clickable{ cursor:pointer; transition:.2s; }
+table.horario th.day-header-clickable:hover{ background:var(--primary); color:var(--on-primary); }
+
+.tareas-btn{
+    display:block; width:100%; background:var(--surface-3); color:var(--on-surface);
+    border:none; padding:11px; border-radius:var(--radius-lg); font-size:13px;
+    font-variation-settings:"wght" 600; cursor:pointer; margin-bottom:18px; transition:.2s;
+}
+.tareas-btn:hover{ background:var(--primary-container); color:var(--on-primary-container); }
+
+/* ===== Modal de tareas ===== */
+
+.tareas-list{ display:flex; flex-direction:column; gap:18px; margin-top:14px; text-align:left; }
+
+.tareas-materia-group{ display:flex; flex-direction:column; gap:8px; }
+.tareas-materia-titulo{
+    font-size:11.5px; letter-spacing:1px; text-transform:uppercase;
+    color:var(--tertiary); font-variation-settings:"wght" 600;
+}
+
+.tarea-item{
+    background:var(--surface-1); border:1px solid var(--outline); border-radius:var(--radius-lg);
+    overflow:hidden;
+}
+.tarea-item-header{
+    width:100%; display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:none; border:none; color:var(--on-surface); text-align:left;
+    padding:12px 14px; cursor:pointer; font-family:inherit;
+}
+.tarea-item-titulo{ font-size:13.5px; font-variation-settings:"wght" 600; }
+.tarea-item-autor{ font-size:10.5px; color:var(--on-surface-var); margin-top:3px; }
+.tarea-item-chevron{
+    width:15px; height:15px; color:var(--on-surface-var); flex-shrink:0; transition:transform .25s;
+}
+.tarea-item.open .tarea-item-chevron{ transform:rotate(180deg); }
+
+.tarea-desc-wrap{ display:grid; grid-template-rows:0fr; transition:grid-template-rows .3s ease; }
+.tarea-item.open .tarea-desc-wrap{ grid-template-rows:1fr; }
+.tarea-desc-inner{ overflow:hidden; }
+.tarea-desc-inner p{
+    padding:0 14px 14px; font-size:12.5px; color:var(--on-surface-var); line-height:1.6;
+    white-space:pre-line;
+}
+
+.tareas-empty{ font-size:12.5px; color:var(--on-surface-var); font-style:italic; text-align:center; padding:6px 0; }
+.tareas-materia-empty{ font-size:12px; color:var(--on-surface-var); font-style:italic; padding:4px 2px; }
+
+.add-tarea-form{
+    display:none; flex-direction:column; gap:10px; margin-top:14px; text-align:left;
+}
+.add-tarea-form.open{ display:flex; }
+.add-tarea-form select,
+.add-tarea-form input[type="text"],
+.add-tarea-form textarea{
+    background:var(--surface-1); border:1px solid var(--outline); border-radius:var(--radius-lg);
+    padding:11px 14px; color:var(--on-surface); font-family:inherit; font-size:13.5px; resize:vertical;
+}
+.add-tarea-form select{ cursor:pointer; }
+.add-tarea-form input::placeholder,
+.add-tarea-form textarea::placeholder{ color:var(--on-surface-var); }
 .day-panel.active{ display:block; }
 
 .timeline-item{ display:flex; gap:10px; }
@@ -628,4 +689,100 @@ table.horario td.libre-cell{ color:var(--on-surface-var); font-style:italic; fon
     .cards-estudiantes{ padding:6px; }
     table.horario{ display:none; }
     .horario-mobile{ display:block; }
+    .timeline-item{
+        margin-bottom:12px;
+    }
+    
+    /* Cuando la misma materia continúa, se mantiene un espacio mínimo */
+    .timeline-item.chain-start,
+    .timeline-item.chain-middle{
+        margin-bottom:0;
+    }
+    
+    .timeline-item.chain-end{
+        margin-bottom:12px;
+    }
+}
+.student-role{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+
+    margin:14px auto 0;
+    padding:10px 18px;
+
+    background:var(--surface-1);
+    border:1px solid var(--outline);
+    border-radius:var(--radius-full);
+
+    color:var(--primary);
+    font-size:13px;
+    font-variation-settings:"wght" 650;
+
+    letter-spacing:.3px;
+}
+.image-viewer{
+    position:fixed;
+    inset:0;
+    z-index:1000;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    background:rgba(10,9,12,.94);
+    backdrop-filter:blur(12px);
+
+    opacity:0;
+    pointer-events:none;
+    transition:.25s;
+}
+
+.image-viewer.active{
+    opacity:1;
+    pointer-events:all;
+}
+
+.image-viewer img{
+    max-width:92vw;
+    max-height:92vh;
+
+    object-fit:contain;
+
+    border-radius:24px;
+
+    box-shadow:0 30px 80px rgba(0,0,0,.5);
+
+    transform:scale(.92);
+    transition:.25s;
+}
+
+.image-viewer.active img{
+    transform:scale(1);
+}
+
+.image-viewer-close{
+    position:absolute;
+    top:22px;
+    right:22px;
+
+    width:42px;
+    height:42px;
+
+    border:none;
+    border-radius:50%;
+
+    background:var(--surface-3);
+    color:var(--on-surface);
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    cursor:pointer;
+}
+
+.image-viewer-close svg{
+    width:18px;
+    height:18px;
 }

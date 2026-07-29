@@ -6,7 +6,6 @@ const cursosDB = [
     {
         id: "2ITB",
         nombre: "2do Informática B",
-        disabled: true
     },
     {
         id: "2CNA",
