@@ -141,10 +141,10 @@ function datosLogin(estudiante) {
     const apellidosCount = partes.length >= 3 ? 2 : (partes.length === 2 ? 1 : 0);
     const primerNombre = partes[0] || "";
     const primerApellido = partes[partes.length - apellidosCount] || partes[partes.length - 1] || "";
-    const anio = estudiante.fechaNacimiento ? estudiante.fechaNacimiento.slice(0, 4) : "";
+    const dia = estudiante.fechaNacimiento ? estudiante.fechaNacimiento.slice(8, 10) : "";
     return {
         username: normalizar(primerNombre + primerApellido),
-        password: normalizar(primerApellido + primerNombre + anio)
+        password: normalizar(primerApellido + primerNombre + dia)
     };
 }
 
@@ -1015,6 +1015,60 @@ function renderGaleria(courseId) {
 
     const duration = Math.max(list.length * 5, 20);
     galeriaTrack.style.animation = `galeriaScroll ${duration}s linear infinite`;
+
+    setupGaleriaAutoScroll();
+}
+
+/* En celular la galería se desliza sola, pero el usuario también puede
+   arrastrarla con el dedo — al soltar, retoma el auto-scroll solo tras
+   una pausa breve. En escritorio sigue siendo la animación CSS de siempre. */
+
+let galeriaAutoTimer = null;
+let galeriaResumeTimer = null;
+let galeriaListenersListos = false;
+
+function esMobileGaleria() {
+    return window.matchMedia("(max-width:700px)").matches;
+}
+
+function iniciarGaleriaAuto() {
+    detenerGaleriaAuto();
+    if (!esMobileGaleria()) return;
+    const viewport = galeriaTrack.parentElement;
+    if (!viewport || viewport.scrollWidth <= viewport.clientWidth) return;
+
+    galeriaAutoTimer = setInterval(() => {
+        const mitad = viewport.scrollWidth / 2;
+        viewport.scrollLeft += 1;
+        if (viewport.scrollLeft >= mitad) viewport.scrollLeft = 0;
+    }, 25);
+}
+
+function detenerGaleriaAuto() {
+    if (galeriaAutoTimer) { clearInterval(galeriaAutoTimer); galeriaAutoTimer = null; }
+}
+
+function pausarGaleriaTemporal() {
+    detenerGaleriaAuto();
+    if (galeriaResumeTimer) clearTimeout(galeriaResumeTimer);
+    galeriaResumeTimer = setTimeout(iniciarGaleriaAuto, 2200);
+}
+
+function setupGaleriaAutoScroll() {
+    const viewport = galeriaTrack.parentElement;
+    if (!viewport) return;
+
+    if (!galeriaListenersListos) {
+        viewport.addEventListener("touchstart", pausarGaleriaTemporal, { passive: true });
+        viewport.addEventListener("touchend", pausarGaleriaTemporal, { passive: true });
+        window.addEventListener("resize", () => {
+            if (esMobileGaleria()) iniciarGaleriaAuto();
+            else detenerGaleriaAuto();
+        });
+        galeriaListenersListos = true;
+    }
+
+    iniciarGaleriaAuto();
 }
 
 /* ===== LOGIN ===== */

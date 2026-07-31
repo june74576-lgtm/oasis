@@ -189,6 +189,8 @@ header{
     background:var(--tertiary); color:var(--on-tertiary);
     font-size:9px; font-variation-settings:"wght" 600;
     padding:3px 8px; border-radius:var(--radius-full);
+    max-width:68px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 
 .students-empty{ color:var(--on-surface-var); font-size:14px; font-style:italic; padding:20px; }
@@ -689,6 +691,13 @@ table.horario th.day-header-clickable:hover{ background:var(--primary); color:va
     .cards-estudiantes{ padding:6px; }
     table.horario{ display:none; }
     .horario-mobile{ display:block; }
+
+    /* Galería: en celular se puede deslizar con el dedo además de
+       moverse sola (el JS controla el auto-scroll y lo pausa al tocar) */
+    .galeria-viewport{ overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+    .galeria-viewport::-webkit-scrollbar{ display:none; }
+    .galeria-track{ animation:none !important; }
+
     .timeline-item{
         margin-bottom:12px;
     }
