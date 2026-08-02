@@ -581,6 +581,31 @@ table.horario th.day-header-clickable:hover{ background:var(--primary); color:va
 
 .login-hint{ margin-top:14px; font-size:12px; color:var(--on-surface-var); font-style:italic; text-align:center; }
 
+.login-divider{
+    display:flex; align-items:center; gap:12px; margin:18px 0 14px; color:var(--on-surface-var); font-size:12px;
+}
+.login-divider::before,
+.login-divider::after{ content:""; flex:1; height:1px; background:var(--outline); }
+
+.google-signin-wrap{ display:flex; justify-content:center; }
+
+.admin-modal{ max-width:560px; text-align:left; }
+.admin-modal h3{ text-align:center; }
+.admin-modal .divider-pill{ margin:18px auto; }
+
+.admin-select{
+    width:100%; background:var(--surface-1); border:1px solid var(--outline);
+    border-radius:var(--radius-lg); padding:11px 14px; color:var(--on-surface);
+    font-family:inherit; font-size:13.5px; cursor:pointer; margin-bottom:8px;
+}
+
+.admin-textarea{
+    width:100%; background:var(--surface-1); border:1px solid var(--outline);
+    border-radius:var(--radius-lg); padding:14px; color:var(--on-surface);
+    font-family:"Courier New", monospace; font-size:12.5px; line-height:1.5;
+    resize:vertical; margin-top:10px;
+}
+
 /* ===== Auth ===== */
 
 .auth{ display:flex; align-items:center; }

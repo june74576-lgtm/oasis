@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oasis</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,7 +14,10 @@
 
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="data/supabase-config.js?v=2"></script>
+    <script src="data/supabase-config.js?v=3"></script>
+
+    <!-- Google Sign-In -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 <base target="_blank">
 </head>
 <body>
@@ -38,6 +42,14 @@
                     <button id="userMenuPerfil" class="user-menu-item">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 19.5c0-3.5 3-6 7-6s7 2.5 7 6"/></svg>
                         Perfil
+                    </button>
+                    <button id="userMenuConectar" class="user-menu-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="6" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 10.8 15.8 7.2M8.2 13.2l7.6 3.6"/></svg>
+                        Conectar cuenta de Google
+                    </button>
+                    <button id="userMenuAdmin" class="user-menu-item" style="display:none;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5h16M4 12h16M4 17.5h10"/></svg>
+                        Administrar
                     </button>
                     <button id="userMenuLogout" class="user-menu-item danger">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4.5H6.5A1.5 1.5 0 0 0 5 6v12a1.5 1.5 0 0 0 1.5 1.5H9M15 15.5l4-4-4-4M19 11.5H9"/></svg>
@@ -162,6 +174,12 @@
             <div class="galeria-viewport">
                 <div class="galeria-track" id="galeriaTrack"></div>
             </div>
+
+            <div class="dropzone" id="galeriaDropzone" style="display:none;">
+                <input type="file" id="galeriaFileInput" accept="image/*" multiple hidden>
+                <p>Arrastra una foto aquí, o <span class="dropzone-link">haz clic</span> (máx. 10 MB c/u)</p>
+            </div>
+            <p class="login-hint" id="galeriaLoginHint">Inicia sesión para sumar fotos a la galería.</p>
         </section>
     </div>
 </div>
@@ -231,7 +249,35 @@
             <input type="password" id="loginPassword" placeholder="Contraseña" autocomplete="current-password">
             <p class="login-error" id="loginError" style="display:none;">Usuario o contraseña incorrectos</p>
             <button id="loginSubmitBtn" class="btn-filled">Entrar</button>
+            <div class="login-divider"><span>o</span></div>
+            <div id="googleSignInDiv" class="google-signin-wrap"></div>
         </div>
+    </div>
+</div>
+
+<!-- Modal: administración -->
+<div class="mini-overlay" id="adminModalOverlay">
+    <div class="mini-modal admin-modal">
+        <button class="modal-close" id="adminModalClose" aria-label="Cerrar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+        <h3>Panel de administración</h3>
+        <div class="divider-pill"></div>
+
+        <select id="adminDataType" class="admin-select">
+            <option value="cursos">Cursos</option>
+            <option value="estudiantes">Estudiantes</option>
+            <option value="profesores">Profesores</option>
+            <option value="materias">Materias</option>
+            <option value="horarios">Horarios</option>
+        </select>
+
+        <p class="login-hint">Es JSON: las claves van entre comillas, ej. "tipo": "clase" (no tipo: "clase").</p>
+
+        <textarea id="adminDataTextarea" class="admin-textarea" rows="16" spellcheck="false"></textarea>
+
+        <p class="login-hint" id="adminSaveStatus"></p>
+        <button id="adminSaveBtn" class="btn-filled">Guardar cambios</button>
     </div>
 </div>
 <!-- Modal: tareas -->
@@ -267,12 +313,12 @@
     <img id="imageViewerImg" src="" alt="">
 </div>
 <!-- Datos locales -->
-<script src="data/cursos.js?v=4"></script>
-<script src="data/profesores.js?v=3"></script>
-<script src="data/materias.js?v=4"></script>
-<script src="data/horarios.js?v=3"></script>
-<script src="data/galeria.js?v=3"></script>
-<script src="data/estudiantes.js?v=3"></script>
-<script src="script.js?v=5"></script>
+<script src="data/cursos.js?v=5"></script>
+<script src="data/profesores.js?v=4"></script>
+<script src="data/materias.js?v=5"></script>
+<script src="data/horarios.js?v=4"></script>
+<script src="data/galeria.js?v=4"></script>
+<script src="data/estudiantes.js?v=4"></script>
+<script src="script.js?v=6"></script>
 </body>
 </html>

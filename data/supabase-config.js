@@ -62,6 +62,30 @@
 // pero alguien con conocimientos técnicos podría saltarse eso. Para
 // este proyecto (compañeros de curso) es un riesgo aceptable.
 
+// ===== Tabla de TAREAS =====
+// Corré esto también en el SQL Editor para que funcione la sección
+// de Tareas (clic en un día del horario):
+//
+//    create table tareas (
+//      id bigint generated always as identity primary key,
+//      curso text not null,
+//      dia text not null,
+//      materia text not null,
+//      titulo text not null,
+//      descripcion text,
+//      autor_id bigint,
+//      autor_nombre text,
+//      fecha timestamptz default now()
+//    );
+//
+//    alter table tareas enable row level security;
+//
+//    create policy "cualquiera puede leer tareas" on tareas
+//      for select using (true);
+//
+//    create policy "cualquiera puede agregar tareas" on tareas
+//      for insert with check (true);
+
 const SUPABASE_URL = "https://mupdiqlibvhvckcoqprp.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGRpcWxpYnZodmNrY29xcHJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3NDQ4NDksImV4cCI6MjEwMDMyMDg0OX0.KI1OdPh9dXKk2DGyNwb8Cfmu1usClbzbx8Zoy1X4V8A";
 
@@ -75,5 +99,5 @@ let supabaseClient = null;
 if (!SUPABASE_URL.includes("TU_PROYECTO") && window.supabase && typeof window.supabase.createClient === "function") {
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 } else {
-    console.warn("[Oasis] Supabase no está configurado todavía — revisá data/supabase-config.js");
+    console.warn("[Oasis] Supabase no está configurado todavía — revisa data/supabase-config.js");
 }

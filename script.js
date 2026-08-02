@@ -97,6 +97,7 @@ const userChipAvatar = document.getElementById("userChipAvatar");
 const userChipName = document.getElementById("userChipName");
 const userMenu = document.getElementById("userMenu");
 const userMenuPerfil = document.getElementById("userMenuPerfil");
+const userMenuConectar = document.getElementById("userMenuConectar");
 const userMenuLogout = document.getElementById("userMenuLogout");
 
 const loginModalOverlay = document.getElementById("loginModalOverlay");
@@ -986,38 +987,124 @@ dropzone.addEventListener("drop", e => {
 
 /* ===== GALERIA ===== */
 
-function renderGaleria(courseId) {
+async function renderGaleria(courseId) {
     const dbAll = typeof galeriaDB !== "undefined" ? galeriaDB : {};
-    const list = dbAll[courseId] || [];
+    let list = (dbAll[courseId] || []).map(item => ({ ruta: item.ruta }));
+
+    if (supabaseListo()) {
+        try {
+            const { data, error } = await supabaseClient
+                .from("galeria_fotos")
+                .select("*")
+                .eq("curso", courseId);
+            if (error) throw error;
+            (data || []).forEach(row => {
+                const { data: urlData } = supabaseClient.storage.from("galeria").getPublicUrl(row.storage_path);
+                list.push({ ruta: urlData.publicUrl });
+            });
+        } catch (err) {
+            console.warn("No se pudieron cargar fotos de galería subidas:", err);
+        }
+    }
+
     galeriaTrack.innerHTML = "";
     galeriaTrack.style.animation = "none";
 
     if (list.length === 0) {
         galeriaTrack.innerHTML = `<p class="galeria-empty">Sin fotos en la galería todavía</p>`;
-        return;
+    } else {
+        const sizeClasses = ["size-a", "size-b", "size-c"];
+        const doubled = list.concat(list);
+
+        doubled.forEach((item, i) => {
+            const div = document.createElement("div");
+            div.classList.add("galeria-item", sizeClasses[i % sizeClasses.length]);
+            const img = document.createElement("img");
+            img.src = item.ruta;
+            img.alt = "";
+            img.loading = "lazy";
+            img.style.cursor = "zoom-in";
+            img.addEventListener("click", () => openImageViewer(item.ruta));
+            div.appendChild(img);
+            galeriaTrack.appendChild(div);
+        });
+
+        const duration = Math.max(list.length * 5, 20);
+        galeriaTrack.style.animation = `galeriaScroll ${duration}s linear infinite`;
     }
 
-    const sizeClasses = ["size-a", "size-b", "size-c"];
-    const doubled = list.concat(list);
-
-    doubled.forEach((item, i) => {
-        const div = document.createElement("div");
-        div.classList.add("galeria-item", sizeClasses[i % sizeClasses.length]);
-        const img = document.createElement("img");
-        img.src = item.ruta;
-        img.alt = "";
-        img.loading = "lazy";
-        img.style.cursor = "zoom-in";
-        img.addEventListener("click", () => openImageViewer(item.ruta));
-        div.appendChild(img);
-        galeriaTrack.appendChild(div);
-    });
-
-    const duration = Math.max(list.length * 5, 20);
-    galeriaTrack.style.animation = `galeriaScroll ${duration}s linear infinite`;
-
     setupGaleriaAutoScroll();
+    updateGaleriaUploadUI();
 }
+
+/* ===== Subida de fotos a la galería (cualquier usuario logueado) ===== */
+
+const galeriaDropzone = document.getElementById("galeriaDropzone");
+const galeriaFileInput = document.getElementById("galeriaFileInput");
+const galeriaLoginHint = document.getElementById("galeriaLoginHint");
+const MAX_GALERIA_SIZE = 10 * 1024 * 1024;
+
+function updateGaleriaUploadUI() {
+    if (currentUser && !currentUser.isAdmin && supabaseListo()) {
+        galeriaDropzone.style.display = "block";
+        galeriaLoginHint.style.display = "none";
+    } else {
+        galeriaDropzone.style.display = "none";
+        galeriaLoginHint.style.display = "block";
+        galeriaLoginHint.textContent = supabaseListo()
+            ? "Inicia sesión para sumar fotos a la galería."
+            : "Supabase todavía no está configurado.";
+    }
+}
+
+async function subirFotosGaleria(files) {
+    if (!currentUser || currentUser.isAdmin || !supabaseListo() || !currentCourse) return;
+    const grandes = Array.from(files).filter(f => f.size > MAX_GALERIA_SIZE);
+    if (grandes.length > 0) {
+        alert(`"${grandes[0].name}" pesa demasiado (máximo 10 MB).`);
+        return;
+    }
+    galeriaDropzone.classList.add("dragging");
+    galeriaDropzone.querySelector("p").textContent = "Subiendo...";
+    try {
+        for (const file of Array.from(files)) {
+            const path = `${currentCourse}/${Date.now()}_${rutaSegura(file.name)}`;
+            const { error: upErr } = await supabaseClient.storage.from("galeria").upload(path, file);
+            if (upErr) throw upErr;
+            const { error: insErr } = await supabaseClient.from("galeria_fotos").insert({
+                curso: currentCourse,
+                storage_path: path,
+                subido_por_id: currentUser.id,
+                subido_por_nombre: currentUser.nombre,
+                fecha: new Date().toISOString()
+            });
+            if (insErr) throw insErr;
+        }
+        await renderGaleria(currentCourse);
+    } catch (err) {
+        console.error(err);
+        alert("Error al subir la foto. Revisa la consola (F12).");
+    } finally {
+        galeriaDropzone.classList.remove("dragging");
+        galeriaDropzone.querySelector("p").innerHTML = `Arrastra una foto aquí, o <span class="dropzone-link">haz clic</span> (máx. 10 MB c/u)`;
+        galeriaFileInput.value = "";
+    }
+}
+
+galeriaDropzone.addEventListener("click", () => galeriaFileInput.click());
+galeriaFileInput.addEventListener("change", e => subirFotosGaleria(e.target.files));
+["dragenter", "dragover"].forEach(evt =>
+    galeriaDropzone.addEventListener(evt, e => { e.preventDefault(); galeriaDropzone.classList.add("dragging"); })
+);
+["dragleave", "drop"].forEach(evt =>
+    galeriaDropzone.addEventListener(evt, e => {
+        e.preventDefault();
+        if (evt === "dragleave") galeriaDropzone.classList.remove("dragging");
+    })
+);
+galeriaDropzone.addEventListener("drop", e => {
+    if (e.dataTransfer.files.length) subirFotosGaleria(e.dataTransfer.files);
+});
 
 /* En celular la galería se desliza sola, pero el usuario también puede
    arrastrarla con el dedo — al soltar, retoma el auto-scroll solo tras
@@ -1075,6 +1162,8 @@ function setupGaleriaAutoScroll() {
 
 let currentUser = null;
 
+let isAdmin = false;
+
 function updateAuthUI() {
     if (currentUser) {
         loginBtn.style.display = "none";
@@ -1083,13 +1172,18 @@ function updateAuthUI() {
 
         const yo = (typeof estudiantesDB !== "undefined" ? estudiantesDB : []).find(e => e.id === currentUser.id);
         userChipAvatar.innerHTML = "";
-        userChipAvatar.appendChild(buildPhotoSlot(yo ? yo.foto : "", currentUser.nombre));
+        userChipAvatar.appendChild(buildPhotoSlot(currentUser.foto || (yo ? yo.foto : ""), currentUser.nombre));
+
+        userMenuAdmin.style.display = isAdmin ? "flex" : "none";
+        userMenuPerfil.style.display = currentUser.isAdmin ? "none" : "flex";
+        userMenuConectar.style.display = currentUser.isAdmin ? "none" : "flex";
     } else {
         loginBtn.style.display = "inline-flex";
         userChip.style.display = "none";
         userChip.classList.remove("open");
     }
     if (materiaModalOverlay.classList.contains("active")) updateUploadUI();
+    if (courseFullscreen.classList.contains("active")) updateGaleriaUploadUI();
 }
 
 loginBtn.addEventListener("click", () => {
@@ -1123,13 +1217,14 @@ function intentarLogin() {
         loginError.style.display = "block";
         return;
     }
+    isAdmin = false;
     currentUser = { id: match.id, nombre: primerNombreCompleto(match.nombre) };
     sessionStorage.setItem("oasis_session", JSON.stringify(currentUser));
     updateAuthUI();
     closeLoginModal();
 }
 
-// Menú del chip de usuario (Perfil / Cerrar sesión)
+// Menú del chip de usuario (Perfil / Conectar / Administrar / Cerrar sesión)
 
 userChipBtn.addEventListener("click", (e) => {
     e.stopPropagation();
@@ -1149,13 +1244,200 @@ userMenuPerfil.addEventListener("click", () => {
 
 userMenuLogout.addEventListener("click", () => {
     currentUser = null;
+    isAdmin = false;
     sessionStorage.removeItem("oasis_session");
     updateAuthUI();
 });
 
 const savedSession = sessionStorage.getItem("oasis_session");
-if (savedSession) currentUser = JSON.parse(savedSession);
+if (savedSession) {
+    currentUser = JSON.parse(savedSession);
+    isAdmin = !!currentUser.isAdmin;
+}
 updateAuthUI();
+
+/* ===== GOOGLE SIGN-IN ===== */
+
+let conectandoGoogle = false;
+
+function parseJwt(token) {
+    const base64Url = token.split(".")[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const jsonPayload = decodeURIComponent(
+        atob(base64).split("").map(c => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2)).join("")
+    );
+    return JSON.parse(jsonPayload);
+}
+
+function handleGoogleCredential(response) {
+    const payload = parseJwt(response.credential);
+    const email = payload.email;
+
+    if (email === ADMIN_EMAIL) {
+        isAdmin = true;
+        currentUser = { id: "admin", nombre: payload.name, isAdmin: true, foto: payload.picture };
+        sessionStorage.setItem("oasis_session", JSON.stringify(currentUser));
+        updateAuthUI();
+        closeLoginModal();
+        return;
+    }
+
+    if (conectandoGoogle && currentUser && !currentUser.isAdmin) {
+        const links = JSON.parse(localStorage.getItem("oasis_google_links") || "{}");
+        links[email] = currentUser.id;
+        localStorage.setItem("oasis_google_links", JSON.stringify(links));
+        conectandoGoogle = false;
+        alert("Tu cuenta de Google quedó conectada. La próxima vez podés entrar con \"Continuar con Google\".");
+        return;
+    }
+
+    const links = JSON.parse(localStorage.getItem("oasis_google_links") || "{}");
+    const estudianteId = links[email];
+    const est = estudianteId
+        ? (typeof estudiantesDB !== "undefined" ? estudiantesDB : []).find(e => e.id === estudianteId)
+        : null;
+
+    if (est) {
+        isAdmin = false;
+        currentUser = { id: est.id, nombre: primerNombreCompleto(est.nombre) };
+        sessionStorage.setItem("oasis_session", JSON.stringify(currentUser));
+        updateAuthUI();
+        closeLoginModal();
+    } else {
+        alert("Esta cuenta de Google todavía no está conectada a ningún estudiante. Iniciá sesión con usuario y contraseña, y después conectala desde el menú de tu perfil.");
+    }
+}
+
+function initGoogleAuth() {
+    if (!window.google || !google.accounts || !google.accounts.id) return;
+    if (GOOGLE_CLIENT_ID.includes("TU_CLIENT_ID")) {
+        console.warn("Falta configurar GOOGLE_CLIENT_ID en data/supabase-config.js");
+        return;
+    }
+    try {
+        google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleGoogleCredential });
+        const div = document.getElementById("googleSignInDiv");
+        if (div) google.accounts.id.renderButton(div, { theme: "filled_black", shape: "pill", size: "large", width: 260 });
+    } catch (err) {
+        console.error("Error inicializando Google Sign-In:", err);
+    }
+}
+window.addEventListener("load", initGoogleAuth);
+
+userMenuConectar.addEventListener("click", () => {
+    userChip.classList.remove("open");
+    if (!window.google || !google.accounts || !google.accounts.id) {
+        alert("Google Sign-In no está disponible todavía.");
+        return;
+    }
+    conectandoGoogle = true;
+    google.accounts.id.prompt();
+});
+
+/* ===== PANEL DE ADMINISTRACIÓN ===== */
+
+const adminModalOverlay = document.getElementById("adminModalOverlay");
+const adminModalClose = document.getElementById("adminModalClose");
+const adminDataType = document.getElementById("adminDataType");
+const adminDataTextarea = document.getElementById("adminDataTextarea");
+const adminSaveBtn = document.getElementById("adminSaveBtn");
+const adminSaveStatus = document.getElementById("adminSaveStatus");
+const userMenuAdmin = document.getElementById("userMenuAdmin");
+
+function getGlobalFor(tipo) {
+    if (tipo === "cursos") return cursosDB;
+    if (tipo === "estudiantes") return estudiantesDB;
+    if (tipo === "profesores") return profesoresDB;
+    if (tipo === "materias") return materiasDB;
+    if (tipo === "horarios") return horariosDB;
+}
+
+function setGlobalFor(tipo, data) {
+    if (tipo === "cursos") cursosDB = data;
+    else if (tipo === "estudiantes") estudiantesDB = data;
+    else if (tipo === "profesores") profesoresDB = data;
+    else if (tipo === "materias") materiasDB = data;
+    else if (tipo === "horarios") horariosDB = data;
+}
+
+function loadAdminTextarea() {
+    adminDataTextarea.value = JSON.stringify(getGlobalFor(adminDataType.value), null, 4);
+    adminSaveStatus.textContent = "";
+}
+
+adminDataType.addEventListener("change", loadAdminTextarea);
+
+userMenuAdmin.addEventListener("click", () => {
+    userChip.classList.remove("open");
+    loadAdminTextarea();
+    adminModalOverlay.classList.add("active");
+    lockScroll();
+});
+
+adminModalClose.addEventListener("click", () => {
+    adminModalOverlay.classList.remove("active");
+    unlockScroll();
+});
+adminModalOverlay.addEventListener("click", e => {
+    if (e.target === adminModalOverlay) {
+        adminModalOverlay.classList.remove("active");
+        unlockScroll();
+    }
+});
+
+adminSaveBtn.addEventListener("click", async () => {
+    const tipo = adminDataType.value;
+    let parsed;
+    try {
+        parsed = JSON.parse(adminDataTextarea.value);
+    } catch (err) {
+        adminSaveStatus.style.color = "#ff8a8a";
+        adminSaveStatus.textContent = "El texto no es JSON válido: " + err.message;
+        return;
+    }
+    if (!supabaseListo()) {
+        adminSaveStatus.style.color = "#ff8a8a";
+        adminSaveStatus.textContent = "Supabase no está configurado.";
+        return;
+    }
+    adminSaveBtn.disabled = true;
+    adminSaveBtn.textContent = "Guardando...";
+    try {
+        const { error } = await supabaseClient
+            .from("config")
+            .upsert({ id: tipo, data: parsed, updated_at: new Date().toISOString() });
+        if (error) throw error;
+        setGlobalFor(tipo, parsed);
+        adminSaveStatus.style.color = "";
+        adminSaveStatus.textContent = "Guardado. Ya está visible para todos.";
+        renderCourses();
+        if (currentCourse) openCourseFullscreen(currentCourse);
+    } catch (err) {
+        console.error(err);
+        adminSaveStatus.style.color = "#ff8a8a";
+        adminSaveStatus.textContent = "Error al guardar: " + err.message;
+    } finally {
+        adminSaveBtn.disabled = false;
+        adminSaveBtn.textContent = "Guardar cambios";
+    }
+});
+
+async function cargarConfigsDesdeSupabase() {
+    if (!supabaseListo()) return;
+    try {
+        const { data, error } = await supabaseClient.from("config").select("*");
+        if (error) throw error;
+        (data || []).forEach(row => {
+            if (["cursos", "estudiantes", "profesores", "materias", "horarios"].includes(row.id) && row.data) {
+                setGlobalFor(row.id, row.data);
+            }
+        });
+        renderCourses();
+    } catch (err) {
+        console.warn("No se pudieron cargar los datos desde Supabase, se usan los archivos locales:", err);
+    }
+}
+cargarConfigsDesdeSupabase();
 
 /* ===== ESTUDIANTES ===== */
 
