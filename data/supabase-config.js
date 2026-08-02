@@ -86,6 +86,72 @@
 //    create policy "cualquiera puede agregar tareas" on tareas
 //      for insert with check (true);
 
+// ===== Google Sign-In (para el panel de administración) =====
+//
+// Pasos para crear tu Client ID (gratis):
+// 1. console.cloud.google.com → creá un proyecto (o usá uno existente)
+// 2. "APIs & Services" → "Credentials" → "Create Credentials" →
+//    "OAuth client ID" → tipo "Web application"
+// 3. En "Authorized JavaScript origins" agregá la URL desde donde
+//    abrís la página (ej. https://tu-usuario.github.io)
+// 4. Copiá el Client ID (termina en .apps.googleusercontent.com) y
+//    pegalo abajo
+//
+// ADMIN_EMAIL es el único correo que va a tener acceso al panel de
+// administración cuando entre con "Continuar con Google".
+
+// ===== Tabla de CONFIGURACIÓN (panel de administración) =====
+//
+//    create table config (
+//      id text primary key,
+//      data jsonb not null,
+//      updated_at timestamptz default now()
+//    );
+//
+//    alter table config enable row level security;
+//
+//    create policy "cualquiera puede leer config" on config
+//      for select using (true);
+//
+//    create policy "cualquiera puede guardar config" on config
+//      for insert with check (true);
+//
+//    create policy "cualquiera puede actualizar config" on config
+//      for update using (true);
+
+// ===== Fotos de galería subidas por estudiantes =====
+//
+//    create table galeria_fotos (
+//      id bigint generated always as identity primary key,
+//      curso text not null,
+//      storage_path text not null,
+//      subido_por_id bigint,
+//      subido_por_nombre text,
+//      fecha timestamptz default now()
+//    );
+//
+//    alter table galeria_fotos enable row level security;
+//
+//    create policy "cualquiera puede leer galeria_fotos" on galeria_fotos
+//      for select using (true);
+//
+//    create policy "cualquiera puede subir galeria_fotos" on galeria_fotos
+//      for insert with check (true);
+//
+// Y en Storage → New bucket → nombre "galeria" → Public bucket → Create.
+// Después, en el SQL Editor:
+//
+//    create policy "acceso publico galeria - leer"
+//    on storage.objects for select
+//    using ( bucket_id = 'galeria' );
+//
+//    create policy "acceso publico galeria - subir"
+//    on storage.objects for insert
+//    with check ( bucket_id = 'galeria' );
+
+const GOOGLE_CLIENT_ID = "46519698675-n171ahdrf9iqtpj6bldlbrd90rmdul9i.apps.googleusercontent.com";
+const ADMIN_EMAIL = "june74576@gmail.com";
+
 const SUPABASE_URL = "https://mupdiqlibvhvckcoqprp.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGRpcWxpYnZodmNrY29xcHJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3NDQ4NDksImV4cCI6MjEwMDMyMDg0OX0.KI1OdPh9dXKk2DGyNwb8Cfmu1usClbzbx8Zoy1X4V8A";
 
@@ -99,5 +165,5 @@ let supabaseClient = null;
 if (!SUPABASE_URL.includes("TU_PROYECTO") && window.supabase && typeof window.supabase.createClient === "function") {
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 } else {
-    console.warn("[Oasis] Supabase no está configurado todavía — revisa data/supabase-config.js");
+    console.warn("[Oasis] Supabase no está configurado todavía — revisá data/supabase-config.js");
 }
