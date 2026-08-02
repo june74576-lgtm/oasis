@@ -207,7 +207,7 @@ function renderMateriaArchivos(files) {
         row.classList.add("archivo-row");
         const subidoPor = file.subido_por_nombre ? `Subido por ${file.subido_por_nombre}` : "";
 
-        const puedeBorrar = currentUser && currentUser.id === file.subido_por_id;
+        const puedeBorrar = isAdmin || (currentUser && currentUser.id === file.subido_por_id);
 
         row.innerHTML = `
             <span class="archivo-icon">${FILE_ICON_SVG}</span>
@@ -748,6 +748,19 @@ function renderTareaMateriaOptions(dia) {
 
 addTareaToggle.addEventListener("click", () => addTareaForm.classList.toggle("open"));
 
+async function borrarTarea(t) {
+    if (!confirm(`¿Borrar la tarea "${t.titulo}"?`)) return;
+    if (!supabaseListo()) return;
+    try {
+        const { error } = await supabaseClient.from("tareas").delete().eq("id", t.id);
+        if (error) throw error;
+        await loadTareas(currentCourse, currentTareaDia);
+    } catch (err) {
+        console.error(err);
+        alert("No se pudo borrar la tarea.");
+    }
+}
+
 async function loadTareas(courseId, dia) {
     tareasList.innerHTML = `<p class="tareas-empty">Cargando...</p>`;
 
@@ -809,6 +822,9 @@ function buildTareaItem(t) {
     const item = document.createElement("div");
     item.classList.add("tarea-item");
 
+    const row = document.createElement("div");
+    row.classList.add("tarea-item-row");
+
     const header = document.createElement("button");
     header.classList.add("tarea-item-header");
     header.type = "button";
@@ -820,7 +836,23 @@ function buildTareaItem(t) {
         <svg class="tarea-item-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
     `;
     header.addEventListener("click", () => item.classList.toggle("open"));
-    item.appendChild(header);
+    row.appendChild(header);
+
+    const puedeBorrarTarea = isAdmin || (currentUser && currentUser.id === t.autor_id);
+    if (puedeBorrarTarea) {
+        const delBtn = document.createElement("button");
+        delBtn.classList.add("tarea-item-delete");
+        delBtn.type = "button";
+        delBtn.setAttribute("aria-label", "Borrar tarea");
+        delBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>`;
+        delBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            borrarTarea(t);
+        });
+        row.appendChild(delBtn);
+    }
+
+    item.appendChild(row);
 
     const descWrap = document.createElement("div");
     descWrap.classList.add("tarea-desc-wrap");
@@ -1326,12 +1358,21 @@ window.addEventListener("load", initGoogleAuth);
 
 userMenuConectar.addEventListener("click", () => {
     userChip.classList.remove("open");
+    if (GOOGLE_CLIENT_ID.includes("TU_CLIENT_ID")) {
+        alert("Todavía no se configuró Google Sign-In (falta pegar el Client ID en data/supabase-config.js).");
+        return;
+    }
     if (!window.google || !google.accounts || !google.accounts.id) {
-        alert("Google Sign-In no está disponible todavía.");
+        alert("Google Sign-In no está disponible todavía. Probá recargar la página.");
         return;
     }
     conectandoGoogle = true;
-    google.accounts.id.prompt();
+    google.accounts.id.prompt((notification) => {
+        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+            conectandoGoogle = false;
+            alert("Google no mostró la ventana (a veces pasa por el navegador). Probá cerrar sesión y entrar de nuevo con el botón \"Continuar con Google\" del login.");
+        }
+    });
 });
 
 /* ===== PANEL DE ADMINISTRACIÓN ===== */

@@ -378,6 +378,14 @@ table.horario th.day-header-clickable:hover{ background:var(--primary); color:va
     background:none; border:none; color:var(--on-surface); text-align:left;
     padding:12px 14px; cursor:pointer; font-family:inherit;
 }
+.tarea-item-row{ display:flex; align-items:center; }
+.tarea-item-delete{
+    flex-shrink:0; width:30px; height:30px; margin-right:8px; border-radius:50%;
+    background:transparent; border:none; color:var(--on-surface-var); cursor:pointer; transition:.2s;
+    display:flex; align-items:center; justify-content:center;
+}
+.tarea-item-delete svg{ width:14px; height:14px; }
+.tarea-item-delete:hover{ background:rgba(255,100,100,.15); color:#ff8a8a; }
 .tarea-item-titulo{ font-size:13.5px; font-variation-settings:"wght" 600; }
 .tarea-item-autor{ font-size:10.5px; color:var(--on-surface-var); margin-top:3px; }
 .tarea-item-chevron{
